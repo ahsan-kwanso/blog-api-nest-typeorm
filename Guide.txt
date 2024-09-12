@@ -1,0 +1,135 @@
+set up the initial folder structure
+search for the folder structures for nestjs projects
+I will be following the modular structure
+first start with setting up the database models and connections
+Will be using sequelize for this
+
+
+setted the models
+then connected the db in config section
+then made a module for db
+then imported that module in main file of app.module.ts
+
+Models are made in db and they are following the constraints as well. Now I will start writing the business logic for the application, and other things like validators, guards middlewares
+
+
+npx sequelize migration:create --name add-some-table
+
+will just generate a migration file, in path specified in .sequelizerc
+
+
+const { resolve } = require('path');
+
+module.exports = {
+  config: resolve('src/config/sequelize.config.js'),
+  'seeders-path': resolve('dist/database/seeders'),
+  'migrations-path': resolve('dist/database/migrations'),
+  'models-path': resolve('dist/database/models'),
+};
+
+
+actually this is important as now you have ts files and you have to consider js files so go for that dist folder
+
+const { resolve } = require('path');
+
+module.exports = {
+  config: resolve('src/config/sequelize.config.js'),
+  'seeders-path': resolve('src/database/seeders'),
+  'migrations-path': resolve('src/database/migrations'),
+  'models-path': resolve('dist/database/models'),
+};
+
+chnaged these to src as create migration and seeders in src directory then changes file extension and so again back to previou sequelizerc file.
+
+npx sequelize-cli db:migrate  
+npx sequelize-cli db:seed:all
+
+
+Now start working on the business logic
+
+
+Suggested Order of Development:
+Modular Structure: Define the module structure for the app (UserModule, PostModule, CommentModule, etc.).
+Controllers & Services: Create simple controllers and services for core features (CRUD operations, DB interactions).
+Authentication: Set up authentication with JWT and implement login, registration, and protected routes.
+Authorization & Guards: Add guards to secure routes based on user roles and permissions.
+Typeguards & Validation: Ensure all request inputs are type-checked and validated.
+Middlewares & Interceptors: Introduce middleware for logging, security, or request preprocessing. Use interceptors for cross-cutting concerns like response transformation and error handling.
+This approach allows you to have a working version of the application quickly while maintaining the flexibility to scale and secure it progressively.
+
+
+First start with user module keep in mind the flow of the applicationa as well, like how to write code
+define the data transfer objects
+define the service
+define the controller
+define the module
+import that module in main module
+
+so this is flow
+
+Now add global error handling mechanism as well
+
+
+
+
+
+
+
+See how to remove any from services
+add your authmiddleware in main file as in app.module.ts specified in prompt, and then test, then add customized services and then further more things
+see how and where you use APP_GUARD globally
+
+
+Now add your custom needed services, then I will test frontend, then I will further look for improvements, like gurads Authorization
+
+
+me request done
+now implement get posts get myposts search posts search my posts also add that custom middleware apply and routing request based on filter param as in your prev backend
+
+
+then move to comment part
+
+then move to authorization part
+
+then more
+
+
+If you want to modify db schema without running migrations use 
+await sequelize.sync({ alter: true });
+other wise run migrations and do so
+
+
+Ok so which concepts are covered so far
+modules
+providers
+controllers
+middlewares
+pipes
+guards
+exception filters
+migrations
+seeders
+sequelize
+CRUD
+customizable services according to the use cases
+
+
+Now will add some authorization to frontend like this will be passing props and some button addition for seeing all the users etc. For sake of practice. Then will review the code and improve it.
+
+
+What I am going to do:
+Admin will be able to delete any post, admin will be able to see all users or make any user admin.
+I have to think of way that I have to send information in jwt payload if someone is admin, and then ignore the checks there for matching userId just directly delete the post.
+
+
+Now I will be doing some work on frontend
+frontend done now will add some sort of backend for that
+
+1- send in a get request (name, email, role, number of posts)
+2- use that update user request to be used by admin only to update the role.
+
+
+
+
+
+Covert that jwt util to class based at the end
