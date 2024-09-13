@@ -5,30 +5,36 @@ import {
   OneToMany,
   BeforeInsert,
   BeforeUpdate,
+  CreateDateColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 import * as bcrypt from 'bcrypt';
-import { Post } from './post.model';
-import { Comment } from './comment.model';
-import { Role } from 'src/types/role.enum';
+import { Post } from './post.entity';
+import { Comment } from './comment.entity';
 
-@Entity()
+enum Role {
+  USER = 'user',
+  ADMIN = 'admin',
+}
+
+@Entity({ name: 'Users' }) // Specify table name if needed
 export class User {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ type: 'varchar', length: 50 })
+  @Column({ type: 'varchar', length: 50, nullable: false })
   name: string;
 
-  @Column({ type: 'varchar', length: 50, unique: true })
+  @Column({ type: 'varchar', length: 50, nullable: false, unique: true })
   email: string;
 
-  @Column({ type: 'varchar', length: 100 })
+  @Column({ type: 'varchar', length: 100, nullable: false, select: false }) // Exclude password by default
   password: string;
 
   @Column({
     type: 'enum',
     enum: Role,
-    default: Role.USER,
+    default: Role.USER, // Default role is user
   })
   role: Role;
 
@@ -38,17 +44,22 @@ export class User {
   @OneToMany(() => Comment, (comment) => comment.user)
   comments: Comment[];
 
-  // Hash the password before inserting into the database
+  @CreateDateColumn({ name: 'createdAt' })
+  createdAt: Date;
+
+  @UpdateDateColumn({ name: 'updatedAt' })
+  updatedAt: Date;
+
   @BeforeInsert()
   @BeforeUpdate()
-  async hashPassword() {
+  async hashPassword(): Promise<void> {
     if (this.password) {
       const salt = await bcrypt.genSalt(10);
       this.password = await bcrypt.hash(this.password, salt);
     }
   }
 
-  // Add a method to validate the password
+  // Method to validate password during login
   async validatePassword(password: string): Promise<boolean> {
     return bcrypt.compare(password, this.password);
   }

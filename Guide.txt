@@ -133,3 +133,21 @@ frontend done now will add some sort of backend for that
 
 
 Covert that jwt util to class based at the end
+
+
+
+
+
+
+
+
+Shifting to TypeORM, basic setup done, created a dataSource file, then added scripts in package.json, make a database module, use that module in app module
+
+created migrations
+generated migrations
+run migrations
+
+
+Migration runs without NestJS runtime. NestJS will use app.module.ts database connection and migration will use dataSource.ts
+
+Now check with nestjs runtime
