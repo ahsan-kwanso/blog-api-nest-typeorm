@@ -18,4 +18,17 @@ export class AuthController {
     const token = await this.authService.login(loginDto);
     return { token: token };
   }
+
+  @Post('verify-email')
+  async verifyEmail(
+    @Body('email') email: string,
+    @Body('code') code: string,
+  ): Promise<string> {
+    const user = await this.authService.verifyEmail(email, code);
+    if (user) {
+      return 'Email successfully verified!';
+    } else {
+      return 'Invalid verification code';
+    }
+  }
 }
