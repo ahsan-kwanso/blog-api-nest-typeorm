@@ -44,6 +44,12 @@ export class User {
   @OneToMany(() => Comment, (comment) => comment.user)
   comments: Comment[];
 
+  @Column({ default: false })
+  isVerified: boolean;
+
+  @Column({ nullable: true })
+  verificationCode: string;
+
   @CreateDateColumn({ name: 'createdAt' })
   createdAt: Date;
 

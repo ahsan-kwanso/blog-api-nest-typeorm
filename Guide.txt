@@ -151,3 +151,10 @@ run migrations
 Migration runs without NestJS runtime. NestJS will use app.module.ts database connection and migration will use dataSource.ts
 
 Now check with nestjs runtime
+
+
+Now all app is working
+Now come to email verification (remember to generate new migration at the end)
+
+
+Add new columns in db
