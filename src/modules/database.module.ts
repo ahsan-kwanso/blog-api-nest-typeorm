@@ -29,6 +29,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
           cli: {
             migrationsDir: __dirname + '/migrations/',
           },
+          logging: true,
         };
       },
       inject: [ConfigService],
