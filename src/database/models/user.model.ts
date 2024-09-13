@@ -1,77 +1,54 @@
 import {
-  Table,
+  Entity,
+  PrimaryGeneratedColumn,
   Column,
-  Model,
-  DataType,
-  HasMany,
-  BeforeSave,
-} from 'sequelize-typescript';
+  OneToMany,
+  BeforeInsert,
+  BeforeUpdate,
+} from 'typeorm';
+import * as bcrypt from 'bcrypt';
 import { Post } from './post.model';
 import { Comment } from './comment.model';
-import * as bcrypt from 'bcrypt';
 import { Role } from 'src/types/role.enum';
 
-@Table({
-  timestamps: true,
-  defaultScope: {
-    attributes: { exclude: ['password'] }, // Exclude password by default
-  },
-  scopes: {
-    withPassword: {
-      attributes: { include: ['password'] }, // Include password when needed
-    },
-  },
-})
-export class User extends Model<User> {
-  @Column({
-    type: DataType.INTEGER,
-    autoIncrement: true,
-    primaryKey: true,
-  })
+@Entity()
+export class User {
+  @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({
-    type: DataType.STRING(50),
-    allowNull: false,
-  })
+  @Column({ type: 'varchar', length: 50 })
   name: string;
 
-  @Column({
-    type: DataType.STRING(50),
-    allowNull: false,
-    unique: true,
-  })
+  @Column({ type: 'varchar', length: 50, unique: true })
   email: string;
 
-  @Column({
-    type: DataType.STRING(100),
-    allowNull: false,
-  })
+  @Column({ type: 'varchar', length: 100 })
   password: string;
 
   @Column({
-    type: DataType.ENUM('admin', 'user'),
-    allowNull: false,
-    defaultValue: 'user', // Default role is user
+    type: 'enum',
+    enum: Role,
+    default: Role.USER,
   })
   role: Role;
 
-  @HasMany(() => Post)
+  @OneToMany(() => Post, (post) => post.user)
   posts: Post[];
 
-  @HasMany(() => Comment)
+  @OneToMany(() => Comment, (comment) => comment.user)
   comments: Comment[];
 
-  // Add a beforeSave hook to hash the password before saving it to the database
-  @BeforeSave
-  static async hashPassword(user: User) {
-    if (user.changed('password')) {
+  // Hash the password before inserting into the database
+  @BeforeInsert()
+  @BeforeUpdate()
+  async hashPassword() {
+    if (this.password) {
       const salt = await bcrypt.genSalt(10);
-      user.password = await bcrypt.hash(user.password, salt);
+      this.password = await bcrypt.hash(this.password, salt);
     }
   }
 
-  // Add a method to validate the password when logging in
+  // Add a method to validate the password
   async validatePassword(password: string): Promise<boolean> {
     return bcrypt.compare(password, this.password);
   }

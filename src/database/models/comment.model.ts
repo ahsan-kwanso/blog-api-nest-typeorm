@@ -1,62 +1,46 @@
 import {
-  Table,
+  Entity,
+  PrimaryGeneratedColumn,
   Column,
-  Model,
-  DataType,
-  ForeignKey,
-  BelongsTo,
-} from 'sequelize-typescript';
+  ManyToOne,
+  JoinColumn,
+  OneToMany,
+} from 'typeorm';
 import { User } from './user.model';
 import { Post } from './post.model';
 
-@Table
-export class Comment extends Model<Comment> {
-  @Column({
-    type: DataType.INTEGER,
-    autoIncrement: true,
-    primaryKey: true,
-  })
+@Entity()
+export class Comment {
+  @PrimaryGeneratedColumn()
   id: number;
 
-  @ForeignKey(() => User)
-  @Column({
-    type: DataType.INTEGER,
-    allowNull: false,
-  })
-  UserId: number;
-
-  @BelongsTo(() => User)
+  @ManyToOne(() => User, (user) => user.comments, { eager: true })
+  @JoinColumn({ name: 'userId' })
   user: User;
 
-  @ForeignKey(() => Post)
-  @Column({
-    type: DataType.INTEGER,
-    allowNull: false,
-  })
-  PostId: number;
+  @Column()
+  userId: number;
 
-  @BelongsTo(() => Post, {
-    foreignKey: 'PostId',
-    onDelete: 'CASCADE', // Cascade delete when post is deleted
-  })
+  @ManyToOne(() => Post, (post) => post.comments, { eager: true })
+  @JoinColumn({ name: 'postId' })
   post: Post;
 
-  @ForeignKey(() => Comment)
-  @Column({
-    type: DataType.INTEGER,
-    allowNull: true,
-  })
-  ParentCommentId: number;
+  @Column()
+  postId: number;
 
-  @BelongsTo(() => Comment, {
-    foreignKey: 'ParentCommentId',
-    onDelete: 'CASCADE', // Ensure this is set
+  @ManyToOne(() => Comment, (comment) => comment.replies, {
+    nullable: true,
+    onDelete: 'CASCADE',
   })
+  @JoinColumn({ name: 'parentCommentId' })
   parentComment: Comment;
 
-  @Column({
-    type: DataType.STRING(100),
-    allowNull: false,
-  })
+  @Column({ nullable: true })
+  parentCommentId: number;
+
+  @Column({ type: 'varchar', length: 100 })
   content: string;
+
+  @OneToMany(() => Comment, (comment) => comment.parentComment)
+  replies: Comment[];
 }

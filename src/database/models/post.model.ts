@@ -1,46 +1,30 @@
 import {
-  Table,
+  Entity,
+  PrimaryGeneratedColumn,
   Column,
-  Model,
-  DataType,
-  ForeignKey,
-  BelongsTo,
-  HasMany,
-} from 'sequelize-typescript';
+  ManyToOne,
+  OneToMany,
+} from 'typeorm';
 import { User } from './user.model';
 import { Comment } from './comment.model';
 
-@Table
-export class Post extends Model<Post> {
-  @Column({
-    type: DataType.INTEGER,
-    autoIncrement: true,
-    primaryKey: true,
-  })
+@Entity()
+export class Post {
+  @PrimaryGeneratedColumn()
   id: number;
 
-  @ForeignKey(() => User)
-  @Column({
-    type: DataType.INTEGER,
-    allowNull: false,
-  })
-  UserId: number;
-
-  @BelongsTo(() => User)
+  @ManyToOne(() => User, (user) => user.posts, { eager: true })
   user: User;
 
-  @Column({
-    type: DataType.STRING(50),
-    allowNull: false,
-  })
+  @Column()
+  userId: number; // TypeORM uses snake_case by default for column names
+
+  @Column({ type: 'varchar', length: 50 })
   title: string;
 
-  @Column({
-    type: DataType.STRING(500),
-    allowNull: false,
-  })
+  @Column({ type: 'varchar', length: 500 })
   content: string;
 
-  @HasMany(() => Comment)
+  @OneToMany(() => Comment, (comment) => comment.post)
   comments: Comment[];
 }

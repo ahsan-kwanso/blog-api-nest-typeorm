@@ -1,29 +1,35 @@
-import { QueryInterface, DataTypes } from 'sequelize';
-import { Sequelize } from 'sequelize-typescript';
+import { createConnection, getRepository } from 'typeorm';
+import { Comment } from 'sequelize-typescript';
 
-export = {
-  up: async (queryInterface: QueryInterface, sequelize: Sequelize) => {
-    await queryInterface.bulkInsert('Comments', [
-      {
-        UserId: 1,
-        PostId: 1,
-        ParentCommentId: null,
-        content: 'Comment on the first post.',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-      {
-        UserId: 1,
-        PostId: 2,
-        ParentCommentId: null,
-        content: 'Comment on the second post.',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-    ]);
-  },
+const seedComments = async () => {
+  const connection = await createConnection();
+  const commentRepository = getRepository(Comment);
 
-  down: async (queryInterface: QueryInterface) => {
-    await queryInterface.bulkDelete('Comments', {});
-  },
+  // Seed data
+  const comments = [
+    {
+      UserId: 1,
+      PostId: 1,
+      ParentCommentId: null,
+      content: 'Comment on the first post.',
+    },
+    {
+      UserId: 1,
+      PostId: 2,
+      ParentCommentId: null,
+      content: 'Comment on the second post.',
+    },
+  ];
+
+  // Insert comments
+  await commentRepository.save(comments);
+
+  console.log('Comments seeded');
+  await connection.close();
 };
+
+// Run the seed function
+seedComments().catch((err) => {
+  console.error('Error seeding data:', err);
+  process.exit(1);
+});

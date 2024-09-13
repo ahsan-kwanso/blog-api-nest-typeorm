@@ -6,7 +6,6 @@ import {
   RequestMethod,
 } from '@nestjs/common';
 import { APP_PIPE, APP_GUARD } from '@nestjs/core';
-import { DatabaseModule } from './modules/database.module';
 import { UserModule } from './modules/user/user.module';
 import { PostModule } from './modules/post/post.module';
 import { CommentModule } from './modules/comment/comment.module';
@@ -18,7 +17,6 @@ import { ConfigModule } from '@nestjs/config';
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }), // Load .env config globally
-    DatabaseModule,
     UserModule,
     PostModule,
     CommentModule,
