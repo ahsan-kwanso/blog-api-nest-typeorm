@@ -108,9 +108,8 @@ export class UserService {
         'COUNT(post.id) AS postscount', // Count posts and alias as postscount
       ])
       .groupBy('user.id') // Group by user ID
-      .take(pageSize) // Limit the results
-      .skip((pageNumber - 1) * pageSize); // Offset for pagination
-
+      .offset((pageNumber - 1) * pageSize) // Offset for pagination skip was not working here so used offset
+      .limit(pageSize); // Limit the results // .take was creating issues here so changed to .limit
     if (role) {
       queryBuilder.andWhere('user.role = :role', { role });
     }
@@ -119,6 +118,7 @@ export class UserService {
       queryBuilder.orderBy(order);
     }
 
+    console.log('Query:', queryBuilder.getSql());
     // Fetch paginated users and total count
     const [users, countResult] = await Promise.all([
       queryBuilder.getRawMany(), // Get raw results
