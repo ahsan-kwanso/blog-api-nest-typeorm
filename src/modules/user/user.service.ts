@@ -118,7 +118,6 @@ export class UserService {
       queryBuilder.orderBy(order);
     }
 
-    console.log('Query:', queryBuilder.getSql());
     // Fetch paginated users and total count
     const [users, countResult] = await Promise.all([
       queryBuilder.getRawMany(), // Get raw results
@@ -153,7 +152,7 @@ export class UserService {
         nextPage,
         pageSize,
         req,
-      ), // Use the UrlGeneratorService
+      ),
     };
   }
 
