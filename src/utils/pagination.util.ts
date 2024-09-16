@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Request } from 'express';
+import * as qs from 'qs';
 
 @Injectable()
 export class UrlGeneratorService {
@@ -13,10 +14,12 @@ export class UrlGeneratorService {
     const baseUrl = `${req.protocol}://${req.get('host')}${req.originalUrl.split('?')[0]}`;
 
     // Append pagination parameters to the existing query string
-    const queryParams = new URLSearchParams(req.query as any);
-    queryParams.set('page', String(nextPage));
-    queryParams.set('limit', pageSize.toString());
+    const queryParams = qs.stringify({
+      ...req.query,
+      page: nextPage,
+      limit: pageSize,
+    });
 
-    return `${baseUrl}?${queryParams.toString()}`;
+    return `${baseUrl}?${queryParams}`;
   }
 }

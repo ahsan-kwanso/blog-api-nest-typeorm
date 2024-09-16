@@ -158,3 +158,7 @@ Now come to email verification (remember to generate new migration at the end)
 
 
 Add new columns in db
+
+
+
+All done what was required, so now will go through the code and study the concepts from documentation, internet, articles etc.
