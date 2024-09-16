@@ -101,7 +101,9 @@ export class AuthService {
       await this.userRepository.save(user);
       return user;
     } else {
-      return null; // Code mismatch
+      throw new BadRequestException(
+        'The verification code you entered is incorrect. Please try again.',
+      ); // Code mismatch
     }
   }
 
@@ -113,20 +115,20 @@ export class AuthService {
     if (!user || !(await user.validatePassword(loginDto.password))) {
       throw new UnauthorizedException('Invalid credentials');
     }
-    // if (!user.isVerified) {
-    //   const verificationCode = crypto.randomBytes(3).toString('hex'); // Generate a new verification code
+    if (!user.isVerified) {
+      const verificationCode = crypto.randomBytes(3).toString('hex'); // Generate a new verification code
 
-    //   // Update the user's verification code in the database
-    //   user.verificationCode = verificationCode;
-    //   await this.userRepository.save(user);
+      // Update the user's verification code in the database
+      user.verificationCode = verificationCode;
+      await this.userRepository.save(user);
 
-    //   // Resend the verification email
-    //   await this.sendVerificationEmail(user.email, verificationCode);
+      // Resend the verification email
+      await this.sendVerificationEmail(user.email, verificationCode);
 
-    //   throw new UnauthorizedException(
-    //     'Your email is not verified. A new verification code has been sent to your email.',
-    //   );
-    // }
+      throw new UnauthorizedException(
+        'Seems like your email is not verified. A new verification code has been sent to your email.',
+      );
+    }
 
     // uncomment on monday and test
 
