@@ -130,8 +130,6 @@ export class UserService {
         .getRawOne(), // Get total count
     ]);
 
-    console.log(users, countResult);
-
     const totalCount = parseInt(countResult?.count || '0', 10);
 
     // Map raw results to UserWithNumberOfPosts interface
