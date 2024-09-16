@@ -8,9 +8,9 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('signup')
-  async signup(@Body() signupDto: SignupDto): Promise<{ token: string }> {
-    const token = await this.authService.signup(signupDto);
-    return { token: token };
+  async signup(@Body() signupDto: SignupDto): Promise<{ message: string }> {
+    const message = await this.authService.signup(signupDto);
+    return { message: message };
   }
 
   @Post('signin')
@@ -23,12 +23,12 @@ export class AuthController {
   async verifyEmail(
     @Body('email') email: string,
     @Body('code') code: string,
-  ): Promise<string> {
+  ): Promise<{ message: string }> {
     const user = await this.authService.verifyEmail(email, code);
     if (user) {
-      return 'Email successfully verified!';
+      return { message: 'Email successfully verified!' };
     } else {
-      return 'Invalid verification code';
+      return { message: 'Invalid verification code' };
     }
   }
 }

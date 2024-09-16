@@ -54,13 +54,6 @@ export class AuthService {
 
     // Return a message to the user indicating that they need to verify their email
     return 'A verification code has been sent to your email. Please verify your account.';
-
-    // return generateToken({
-    //   id: user.id,
-    //   name: user.name,
-    //   email: user.email,
-    //   role: user.role,
-    // });
   }
 
   private async sendVerificationEmail(
@@ -110,27 +103,30 @@ export class AuthService {
   async login(loginDto: LoginDto): Promise<string> {
     const user = await this.userRepository.findOne({
       where: { email: loginDto.email },
-      select: ['id', 'name', 'email', 'password', 'role', 'isVerified'], // Manually select password
+      select: [
+        'id',
+        'name',
+        'email',
+        'password',
+        'role',
+        'isVerified',
+        'verificationCode',
+      ], // Manually select password
     });
+
     if (!user || !(await user.validatePassword(loginDto.password))) {
       throw new UnauthorizedException('Invalid credentials');
     }
-    if (!user.isVerified) {
-      const verificationCode = crypto.randomBytes(3).toString('hex'); // Generate a new verification code
 
-      // Update the user's verification code in the database
-      user.verificationCode = verificationCode;
-      await this.userRepository.save(user);
-
-      // Resend the verification email
+    if (user && !user.isVerified) {
+      const verificationCode: string = user.verificationCode;
+      console.log(verificationCode);
       await this.sendVerificationEmail(user.email, verificationCode);
 
       throw new UnauthorizedException(
-        'Seems like your email is not verified. A new verification code has been sent to your email.',
+        'Email not verified. A verification code has been sent to your email.',
       );
     }
-
-    // uncomment on monday and test
 
     return generateToken({
       id: user.id,
