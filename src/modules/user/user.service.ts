@@ -22,6 +22,12 @@ import { v4 as uuidv4 } from 'uuid'; // For generating unique file names
 
 @Injectable()
 export class UserService {
+  private readonly MAX_FILE_SIZE_MB = 10; // Maximum file size in MB
+  private readonly ALLOWED_MIME_TYPES = [
+    'image/jpeg',
+    'image/png',
+    'image/gif',
+  ];
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
@@ -232,23 +238,35 @@ export class UserService {
       throw new NotFoundException('User not found');
     }
 
+    if (!this.ALLOWED_MIME_TYPES.includes(file.mimetype)) {
+      throw new ForbiddenException(
+        'Invalid file type. Only images are allowed.',
+      );
+    }
+
+    // Validate file size
+    if (file.size > this.MAX_FILE_SIZE_MB * 1024 * 1024) {
+      // Convert MB to bytes
+      throw new ForbiddenException('File size exceeds 10MB.');
+    }
+
     const fileName = `${uuidv4()}-${file.originalname}`;
     const fileKey = `profile-pictures/${fileName}`;
 
     try {
-      // const uploadResult = await s3
-      //   .upload({
-      //     Bucket: process.env.AWS_S3_BUCKET_NAME!,
-      //     Key: fileKey,
-      //     Body: file.buffer,
-      //     ContentType: file.mimetype,
-      //   })
-      //   .promise();
+      await s3
+        .upload({
+          Bucket: process.env.AWS_S3_BUCKET_NAME!,
+          Key: fileKey,
+          Body: file.buffer,
+          ContentType: file.mimetype,
+        })
+        .promise();
 
       const signedUrl = s3.getSignedUrl('getObject', {
         Bucket: process.env.AWS_S3_BUCKET_NAME!,
         Key: fileKey,
-        Expires: 604800, // URL valid for 1 hour
+        Expires: 6000 * 6000, // URL validity time
       });
 
       user.profilePictureUrl = signedUrl;
