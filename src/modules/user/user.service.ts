@@ -3,9 +3,9 @@ import {
   NotFoundException,
   ConflictException,
   ForbiddenException,
+  InternalServerErrorException,
 } from '@nestjs/common';
 import { User } from 'src/database/entities/user.entity';
-import { Post } from 'src/database/entities/post.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -17,6 +17,8 @@ import paginationConfig from 'src/utils/pagination.config';
 import { Request as ExpressRequest } from 'express';
 import { UrlGeneratorService } from 'src/utils/pagination.util';
 import { Repository } from 'typeorm';
+import { s3 } from 'src/config/s3.config'; // Import S3 configuration
+import { v4 as uuidv4 } from 'uuid'; // For generating unique file names
 
 @Injectable()
 export class UserService {
@@ -212,5 +214,49 @@ export class UserService {
   // get logged in user
   async getCurrentUser(id: number): Promise<User> {
     return this.findOne(id);
+  }
+
+  async uploadProfilePicture(
+    userId: number,
+    file: Express.Multer.File,
+    loggedInUserId: number,
+  ): Promise<User> {
+    if (userId !== loggedInUserId) {
+      throw new ForbiddenException('You are not authenticated.');
+    }
+    const user = await this.userRepository.findOne({
+      where: { id: userId },
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    const fileName = `${uuidv4()}-${file.originalname}`;
+    const fileKey = `profile-pictures/${fileName}`;
+
+    try {
+      // const uploadResult = await s3
+      //   .upload({
+      //     Bucket: process.env.AWS_S3_BUCKET_NAME!,
+      //     Key: fileKey,
+      //     Body: file.buffer,
+      //     ContentType: file.mimetype,
+      //   })
+      //   .promise();
+
+      const signedUrl = s3.getSignedUrl('getObject', {
+        Bucket: process.env.AWS_S3_BUCKET_NAME!,
+        Key: fileKey,
+        Expires: 604800, // URL valid for 1 hour
+      });
+
+      user.profilePictureUrl = signedUrl;
+      await this.userRepository.save(user);
+
+      return user;
+    } catch (error) {
+      throw new InternalServerErrorException('Error uploading file to S3');
+    }
   }
 }

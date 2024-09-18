@@ -10,7 +10,10 @@ import {
   ParseIntPipe,
   UseGuards,
   Query,
+  UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -83,5 +86,21 @@ export class UserController {
   @Delete(':id')
   async remove(@Param('id', ParseIntPipe) id: string) {
     return this.userService.remove(+id);
+  }
+
+  @Post(':id/upload-profile-picture')
+  @UseInterceptors(FileInterceptor('file'))
+  async uploadProfilePicture(
+    @Param('id') userId: number,
+    @UploadedFile() file: Express.Multer.File,
+    @Req() req: ExpressRequest,
+  ) {
+    const loggedInUserId = req.user.id;
+    const user = await this.userService.uploadProfilePicture(
+      Number(userId),
+      file,
+      Number(loggedInUserId),
+    );
+    return { profilePictureUrl: user.profilePictureUrl };
   }
 }
