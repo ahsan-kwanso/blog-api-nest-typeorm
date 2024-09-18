@@ -162,3 +162,6 @@ Add new columns in db
 
 
 All done what was required, so now will go through the code and study the concepts from documentation, internet, articles etc.
+
+
+getRawMany will only return selected entities from table while getMany will return the whole instance of entities means all columns will be included

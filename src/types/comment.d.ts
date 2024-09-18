@@ -1,5 +1,3 @@
-import { Optional } from 'sequelize';
-
 // Base interface for comment data
 export interface BaseCommentData {
   id: number;

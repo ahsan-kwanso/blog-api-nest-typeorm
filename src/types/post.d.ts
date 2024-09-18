@@ -1,5 +1,3 @@
-import { Optional } from 'sequelize';
-
 export interface PostAttributes {
   id: number;
   title: string;
