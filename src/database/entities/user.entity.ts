@@ -50,6 +50,9 @@ export class User {
   @Column({ nullable: true })
   verificationCode: string;
 
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  profilePictureUrl: string | null; // New column for profile picture URL
+
   @CreateDateColumn({ name: 'createdAt' })
   createdAt: Date;
 
