@@ -74,15 +74,15 @@ export class PostController {
     @Req() req: ExpressRequest,
   ): Promise<PaginatedPostsResponse> {
     if (filter === 'my-posts' && userId) {
-      return this.postService.searchUserPostsByTitle(
-        parseInt(userId),
+      return this.postService.searchPosts(
         title,
         paginationQuery.page,
         paginationQuery.limit,
         req,
+        parseInt(userId),
       );
     } else {
-      return this.postService.searchPostsByTitle(
+      return this.postService.searchPosts(
         title,
         paginationQuery.page,
         paginationQuery.limit,

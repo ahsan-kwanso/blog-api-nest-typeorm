@@ -42,98 +42,6 @@ export class PostService {
     return this.postRepository.find();
   }
 
-  // async getPosts(
-  //   page: number = paginationConfig.defaultPage,
-  //   limit: number = paginationConfig.defaultLimit,
-  //   req: ExpressRequest,
-  // ): Promise<PaginatedPostsResponse> {
-  //   const pageSize = Number(limit);
-  //   const pageNumber = Number(page);
-
-  //   // Fetch posts with pagination and related user
-  //   const [posts, total] = await this.postRepository.findAndCount({
-  //     take: pageSize,
-  //     skip: (pageNumber - 1) * pageSize,
-  //     relations: ['user'], // Eager load the user relation
-  //     order: { createdAt: 'DESC' },
-  //   });
-
-  //   // Map posts to required format
-  //   const formattedPosts: PostResponse[] = posts.map((post) => ({
-  //     id: post.id,
-  //     author: post.user?.name || 'Unknown', // Access the user's name
-  //     title: post.title,
-  //     content: post.content,
-  //     date: post.updatedAt?.toISOString().split('T')[0], // Format date as YYYY-MM-DD
-  //   }));
-
-  //   // Calculate pagination details
-  //   const totalPages = Math.ceil(total / pageSize);
-  //   const nextPage = pageNumber < totalPages ? pageNumber + 1 : null;
-
-  //   return {
-  //     posts: formattedPosts,
-  //     total,
-  //     page: pageNumber,
-  //     pageSize: pageSize,
-  //     nextPage: this.urlGeneratorService.generateNextPageUrl(
-  //       nextPage,
-  //       pageSize,
-  //       req,
-  //     ), // Use the UrlGeneratorService
-  //   };
-  // }
-
-  // async getMyPosts(
-  //   userId: number,
-  //   page: number = paginationConfig.defaultPage,
-  //   limit: number = paginationConfig.defaultLimit,
-  //   req: ExpressRequest,
-  // ): Promise<PaginatedPostsResponse> {
-  //   const pageSize = Number(limit);
-  //   const pageNumber = Number(page);
-
-  //   // Check if the user has permission to access these posts
-  //   if (userId !== req.user.id) {
-  //     throw new ForbiddenException('You do not have permissions');
-  //   }
-
-  //   // Fetch posts with pagination and related user
-  //   const [posts, total] = await this.postRepository
-  //     .createQueryBuilder('post')
-  //     .leftJoinAndSelect('post.user', 'user') // Eager load the user relation
-  //     .where('post.UserId = :userId', { userId }) // Filter posts by the current user's ID
-  //     .take(pageSize)
-  //     .skip((pageNumber - 1) * pageSize)
-  //     .orderBy('post.createdAt', 'DESC')
-  //     .getManyAndCount();
-
-  //   // Map posts to required format
-  //   const formattedPosts: PostResponse[] = posts.map((post) => ({
-  //     id: post.id,
-  //     author: post.user?.name || 'Unknown', // Access the user's name
-  //     title: post.title,
-  //     content: post.content,
-  //     date: post.updatedAt?.toISOString().split('T')[0], // Format date as YYYY-MM-DD
-  //   }));
-
-  //   // Calculate pagination details
-  //   const totalPages = Math.ceil(total / pageSize);
-  //   const nextPage = pageNumber < totalPages ? pageNumber + 1 : null;
-
-  //   return {
-  //     posts: formattedPosts,
-  //     total,
-  //     page: pageNumber,
-  //     pageSize: pageSize,
-  //     nextPage: this.urlGeneratorService.generateNextPageUrl(
-  //       nextPage,
-  //       pageSize,
-  //       req,
-  //     ), // Use the UrlGeneratorService
-  //   };
-  // }
-
   async getPosts(
     page: number = paginationConfig.defaultPage,
     limit: number = paginationConfig.defaultLimit,
@@ -213,64 +121,18 @@ export class PostService {
     };
   }
 
-  async searchPostsByTitle(
+  async searchPosts(
     title: string,
     page: number = paginationConfig.defaultPage,
     limit: number = paginationConfig.defaultLimit,
     req: ExpressRequest,
+    userId?: number, // Optional userId for filtering user-specific posts
   ): Promise<PaginatedPostsResponse> {
     const pageSize = Number(limit);
     const pageNumber = Number(page);
 
-    // Build the query to fetch posts with pagination, filtering, and sorting
-    const queryBuilder: SelectQueryBuilder<Post> = this.postRepository
-      .createQueryBuilder('post')
-      .leftJoinAndSelect('post.user', 'user') // Eager load the user relation
-      .where('post.title ILIKE :title', { title: `%${title}%` }) // Case-insensitive search
-      .take(pageSize)
-      .skip((pageNumber - 1) * pageSize)
-      .orderBy('post.createdAt', 'DESC');
-
-    // Execute the query and get the results
-    const [posts, total] = await queryBuilder.getManyAndCount();
-
-    // Map posts to required format
-    const formattedPosts: PostResponse[] = posts.map((post) => ({
-      id: post.id,
-      author: post.user?.name || 'Unknown', // Access the user's name
-      title: post.title,
-      content: post.content,
-      date: post.updatedAt?.toISOString().split('T')[0], // Format date as YYYY-MM-DD
-    }));
-
-    // Calculate pagination details
-    const totalPages = Math.ceil(total / pageSize);
-    const nextPage = pageNumber < totalPages ? pageNumber + 1 : null;
-
-    return {
-      posts: formattedPosts,
-      total,
-      page: pageNumber,
-      pageSize: pageSize,
-      nextPage: this.urlGeneratorService.generateNextPageUrl(
-        nextPage,
-        pageSize,
-        req,
-      ),
-    };
-  }
-
-  async searchUserPostsByTitle(
-    userId: number,
-    title: string,
-    page: number = paginationConfig.defaultPage,
-    limit: number = paginationConfig.defaultLimit,
-    req: ExpressRequest,
-  ): Promise<PaginatedPostsResponse> {
-    const pageSize = Number(limit);
-    const pageNumber = Number(page);
-
-    if (userId !== req.user.id) {
+    // Check if filtering by user is needed
+    if (userId && userId !== req.user.id) {
       throw new ForbiddenException('You do not have permissions');
     }
 
@@ -278,8 +140,14 @@ export class PostService {
     const queryBuilder: SelectQueryBuilder<Post> = this.postRepository
       .createQueryBuilder('post')
       .leftJoinAndSelect('post.user', 'user') // Eager load the user relation
-      .where('post.title ILIKE :title', { title: `%${title}%` }) // Case-insensitive search
-      .andWhere('post.UserId = :userId', { userId }) // Filter by userId
+      .where('post.title ILIKE :title', { title: `%${title}%` }); // Case-insensitive search for title
+
+    // If userId is provided, filter posts by the current user's ID
+    if (userId) {
+      queryBuilder.andWhere('post.UserId = :userId', { userId });
+    }
+
+    queryBuilder
       .take(pageSize)
       .skip((pageNumber - 1) * pageSize)
       .orderBy('post.createdAt', 'DESC');
