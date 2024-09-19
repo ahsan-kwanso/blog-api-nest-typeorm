@@ -19,9 +19,6 @@ import { UpdatePostDto } from './dto/update-post.dto';
 import { Post as PostModel } from 'src/database/entities/post.entity';
 import { PaginatedPostsResponse } from 'src/types/post';
 import { JwtConditionalAuthGuard } from '../auth/jwt.auth.guard';
-import { Role } from 'src/types/role.enum';
-import { RolesGuard } from '../auth/roles.guard';
-import { Roles } from '../auth/roles.decorator'; //our custom decorator
 
 @Controller('posts')
 export class PostController {
