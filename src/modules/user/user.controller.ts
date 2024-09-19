@@ -91,7 +91,7 @@ export class UserController {
   @Post(':id/upload-profile-picture')
   @UseInterceptors(FileInterceptor('file'))
   async uploadProfilePicture(
-    @Param('id') userId: number,
+    @Param('id', ParseIntPipe) userId: number,
     @UploadedFile() file: Express.Multer.File,
     @Req() req: ExpressRequest,
   ) {
