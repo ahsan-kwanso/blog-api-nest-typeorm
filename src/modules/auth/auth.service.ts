@@ -13,6 +13,7 @@ import { SignupDto } from './dto/signup.dto';
 import { LoginDto } from './dto/login.dto';
 import { generateToken } from 'src/utils/jwt.util';
 import axios from 'axios';
+import * as sgMail from '@sendgrid/mail';
 dotenv.config();
 
 @Injectable()
@@ -22,16 +23,18 @@ export class AuthService {
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
   ) {
-    // Configure Nodemailer transporter
-    this.transporter = nodemailer.createTransport({
-      host: process.env.SMTP_HOST,
-      port: Number(process.env.SMTP_PORT),
-      secure: false, // true for 465, false for other ports (587 for Gmail)
-      auth: {
-        user: process.env.SMTP_USER, // Your email address
-        pass: process.env.SMTP_PASS, // Your email password
-      },
-    });
+    // // Configure Nodemailer transporter
+    // this.transporter = nodemailer.createTransport({
+    //   host: process.env.SMTP_HOST,
+    //   port: Number(process.env.SMTP_PORT),
+    //   secure: false, // true for 465, false for other ports (587 for Gmail)
+    //   auth: {
+    //     user: process.env.SMTP_USER, // Your email address
+    //     pass: process.env.SMTP_PASS, // Your email password
+    //   },
+    // });
+    // Configure SendGrid client
+    sgMail.setApiKey(process.env.SENDGRID_API_KEY!);
   }
 
   async signup(signupDto: SignupDto): Promise<string> {
@@ -43,7 +46,7 @@ export class AuthService {
     if (existingUser) {
       throw new UnauthorizedException('User already exists');
     }
-    const emailValidationStatus = await this.validateEmail(signupDto.email);
+    const emailValidationStatus = await this.validateEmail(signupDto.email); // run python flask api for this
     if (emailValidationStatus !== 'Email is Valid') {
       return `Seems Like Email doesn't exist or not valid`;
     }
@@ -52,9 +55,9 @@ export class AuthService {
       isVerified: false, // User is not verified yet
       verificationCode: verificationCode, // Store the verification code
     });
-    await this.userRepository.save(user);
     // Send the verification code to the user's email
-    await this.sendVerificationEmail(user.email, verificationCode);
+    await this.sendVerificationEmail(signupDto.email, verificationCode);
+    await this.userRepository.save(user);
 
     // Return a message to the user indicating that they need to verify their email
     return 'A verification code has been sent to your email. Please verify your account.';
@@ -72,14 +75,37 @@ export class AuthService {
     }
   }
 
+  // private async sendVerificationEmail(
+  //   email: string,
+  //   code: string,
+  // ): Promise<void> {
+  //   // Email message content
+  //   const mailOptions = {
+  //     from: process.env.SMTP_USER, // Sender address
+  //     to: email, // Recipient's email address
+  //     subject: 'Verify Your Email Address', // Subject line
+  //     text: `Please use the following verification code to verify your email: ${code}`,
+  //     html: `<p>Thank you for registering! Use the following code to verify your email:</p><h2>${code}</h2>`,
+  //   };
+
+  //   // Send email
+  //   try {
+  //     await this.transporter.sendMail(mailOptions);
+  //     console.log(`Verification email sent to ${email}`);
+  //   } catch (error) {
+  //     console.error('Error sending verification email:', error);
+  //     throw new Error('Failed to send verification email');
+  //   }
+  // }
+
   private async sendVerificationEmail(
     email: string,
     code: string,
   ): Promise<void> {
     // Email message content
-    const mailOptions = {
-      from: process.env.SMTP_USER, // Sender address
+    const msg = {
       to: email, // Recipient's email address
+      from: process.env.SENDGRID_SENDER_EMAIL!, // Sender address (must be verified in SendGrid), now verified
       subject: 'Verify Your Email Address', // Subject line
       text: `Please use the following verification code to verify your email: ${code}`,
       html: `<p>Thank you for registering! Use the following code to verify your email:</p><h2>${code}</h2>`,
@@ -87,7 +113,7 @@ export class AuthService {
 
     // Send email
     try {
-      await this.transporter.sendMail(mailOptions);
+      await sgMail.send(msg);
       console.log(`Verification email sent to ${email}`);
     } catch (error) {
       console.error('Error sending verification email:', error);
