@@ -1,5 +1,4 @@
 import * as crypto from 'crypto';
-import * as nodemailer from 'nodemailer';
 import * as dotenv from 'dotenv';
 import {
   BadRequestException,
@@ -18,22 +17,10 @@ dotenv.config();
 
 @Injectable()
 export class AuthService {
-  private transporter: nodemailer.Transporter;
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
   ) {
-    // // Configure Nodemailer transporter
-    // this.transporter = nodemailer.createTransport({
-    //   host: process.env.SMTP_HOST,
-    //   port: Number(process.env.SMTP_PORT),
-    //   secure: false, // true for 465, false for other ports (587 for Gmail)
-    //   auth: {
-    //     user: process.env.SMTP_USER, // Your email address
-    //     pass: process.env.SMTP_PASS, // Your email password
-    //   },
-    // });
-    // Configure SendGrid client
     sgMail.setApiKey(process.env.SENDGRID_API_KEY!);
   }
 
@@ -74,29 +61,6 @@ export class AuthService {
       throw new Error('Failed to validate email');
     }
   }
-
-  // private async sendVerificationEmail(
-  //   email: string,
-  //   code: string,
-  // ): Promise<void> {
-  //   // Email message content
-  //   const mailOptions = {
-  //     from: process.env.SMTP_USER, // Sender address
-  //     to: email, // Recipient's email address
-  //     subject: 'Verify Your Email Address', // Subject line
-  //     text: `Please use the following verification code to verify your email: ${code}`,
-  //     html: `<p>Thank you for registering! Use the following code to verify your email:</p><h2>${code}</h2>`,
-  //   };
-
-  //   // Send email
-  //   try {
-  //     await this.transporter.sendMail(mailOptions);
-  //     console.log(`Verification email sent to ${email}`);
-  //   } catch (error) {
-  //     console.error('Error sending verification email:', error);
-  //     throw new Error('Failed to send verification email');
-  //   }
-  // }
 
   private async sendVerificationEmail(
     email: string,
