@@ -11,8 +11,8 @@ import { User } from 'src/database/entities/user.entity'; // Updated import path
 import { SignupDto } from './dto/signup.dto';
 import { LoginDto } from './dto/login.dto';
 import { generateToken } from 'src/utils/jwt.util';
-import axios from 'axios';
 import * as sgMail from '@sendgrid/mail';
+import { EmailService } from 'src/thirdParty/sg/email.service';
 dotenv.config();
 
 @Injectable()
@@ -20,6 +20,7 @@ export class AuthService {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    private readonly emailService: EmailService,
   ) {
     sgMail.setApiKey(process.env.SENDGRID_API_KEY!);
   }
@@ -39,34 +40,14 @@ export class AuthService {
       verificationCode: verificationCode, // Store the verification code
     });
     // Send the verification code to the user's email
-    await this.sendVerificationEmail(signupDto.email, verificationCode);
+    await this.emailService.sendVerificationEmail(
+      signupDto.email,
+      verificationCode,
+    );
     await this.userRepository.save(user);
 
     // Return a message to the user indicating that they need to verify their email
     return 'A verification code has been sent to your email. Please verify your account.';
-  }
-
-  private async sendVerificationEmail(
-    email: string,
-    code: string,
-  ): Promise<void> {
-    // Email message content
-    const msg = {
-      to: email, // Recipient's email address
-      from: process.env.SENDGRID_SENDER_EMAIL!, // Sender address (must be verified in SendGrid), now verified
-      subject: 'Verify Your Email Address', // Subject line
-      text: `Please use the following verification code to verify your email: ${code}`,
-      html: `<p>Thank you for registering! Use the following code to verify your email:</p><h2>${code}</h2>`,
-    };
-
-    // Send email
-    try {
-      await sgMail.send(msg);
-      console.log(`Verification email sent to ${email}`);
-    } catch (error) {
-      console.error('Error sending verification email:', error);
-      throw new Error('Failed to send verification email');
-    }
   }
 
   async verifyEmail(email: string, code: string): Promise<User | null> {
@@ -111,7 +92,10 @@ export class AuthService {
     if (user && !user.isVerified) {
       const verificationCode: string = user.verificationCode;
       console.log(verificationCode);
-      await this.sendVerificationEmail(user.email, verificationCode);
+      await this.emailService.sendVerificationEmail(
+        user.email,
+        verificationCode,
+      );
 
       throw new UnauthorizedException(
         'Email not verified. A verification code has been sent to your email.',

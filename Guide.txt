@@ -220,7 +220,7 @@ see default pacakage included and all scripts definition in package.json  --- do
 see all the work of async await see github repo of someone and then proceed --- done
 After this remove modules to outside  --- done
 update feature should return just messages --- done
-make some thing for env config like what and how
+make some thing for env config like what and how --- done
 then head to chat and see what was Suggested
 then move auth to user module
 see what was asked for files and remove that Pipe as well
@@ -228,11 +228,35 @@ then after working on all recommendations change the schema for db like separate
 and write the subscribers then for those validate and encrypting the password
 move entities to modules then
 move types to dtos in modules
-see about rxjs as well
+see about rxjs as well  ---- done
 don't use whole request get id just like thing see in commented code
 that thing of instance creation as well when repository is injected
-modify that edit and delete response as well
+modify that edit and delete response as   ---- done
 modify frontend to send only the token
 how to enforce that .service .controller file extension
-make separate modules for email and file upload
+make separate modules for email and file upload ----file module separated now separat send mail module
+*/
+
+
+
+
+
+/*
+loader on image
+container app, posts page, check for  commetns only call
+verify through link.
+and don't generate token before verification
+don't return null in verifyOtp, in signin case you don't need isverified
+separate table for OTP and create one-many. ----------------------------------
+consider otp used at, verified at  -------------------------------------------
+store token in redis this is one technique as well ---------------------------
+instead of isverified use verifiedat -----------------------------------------
+session based authentication as well -----------------------------------------
+timer stored in local storage
+
+
+sign up verificaiton email --> token gen from backend and that in url, and then send the link, then user should login, get from query param.
+will implementation verification link technique, i think that will be better
+Which type of interactivity needed so that we need CSR
+middleware application otherways
 */
