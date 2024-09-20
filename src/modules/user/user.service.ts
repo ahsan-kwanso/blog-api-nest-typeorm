@@ -219,7 +219,7 @@ export class UserService {
 
   // get logged in user
   async getCurrentUser(id: number): Promise<User> {
-    return this.findOne(id);
+    return await this.findOne(id);
   }
 
   async uploadProfilePicture(

@@ -30,7 +30,7 @@ export class UserController {
 
   @Post()
   async create(@Body() createUserDto: CreateUserDto) {
-    return this.userService.create(createUserDto);
+    return await this.userService.create(createUserDto);
   }
 
   @Get('/v1')
@@ -50,7 +50,7 @@ export class UserController {
   ) {
     const page = paginationQuery?.page;
     const limit = paginationQuery?.limit;
-    return this.userService.findAllPaginated(
+    return await this.userService.findAllPaginated(
       req,
       page,
       limit,
@@ -64,7 +64,7 @@ export class UserController {
   @Get('/me')
   async currentUser(@Req() req: ExpressRequest) {
     const UserId = req.user?.id;
-    return this.userService.getCurrentUser(UserId);
+    return await this.userService.getCurrentUser(UserId);
   }
 
   @Get(':id')
@@ -80,7 +80,7 @@ export class UserController {
     @Req() req: ExpressRequest,
   ) {
     const adminId = req.user.id;
-    return this.userService.update(+id, updateUserDto, adminId);
+    return await this.userService.update(+id, updateUserDto, adminId);
   }
 
   @Delete(':id')
@@ -88,16 +88,17 @@ export class UserController {
     return this.userService.remove(+id);
   }
 
+  // file format validation, create custom interceptor inside use interceptor
   @Post(':id/upload-profile-picture')
   @UseInterceptors(FileInterceptor('file'))
   async uploadProfilePicture(
     @Param('id', ParseIntPipe) userId: number,
     @UploadedFile() file: Express.Multer.File,
-    @Req() req: ExpressRequest,
+    @Req() req: ExpressRequest, // add custom decorator and then get user
   ) {
     const loggedInUserId = req.user.id;
     const user = await this.userService.uploadProfilePicture(
-      Number(userId),
+      Number(userId), // decorator for params validation don't pass Number(e.g)
       file,
       Number(loggedInUserId),
     );
