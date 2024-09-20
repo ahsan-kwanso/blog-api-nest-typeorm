@@ -19,7 +19,7 @@ export class Comment {
   UserId: number;
 
   @ManyToOne(() => User, (user) => user.comments, { nullable: false })
-  @JoinColumn()
+  @JoinColumn({ name: 'UserId' })
   user: User;
 
   @Column({ type: 'int', nullable: false })
@@ -29,7 +29,7 @@ export class Comment {
     onDelete: 'CASCADE',
     nullable: false,
   })
-  @JoinColumn()
+  @JoinColumn({ name: 'PostId' })
   post: Post;
 
   @Column({ type: 'int', nullable: true })
@@ -39,7 +39,7 @@ export class Comment {
     onDelete: 'CASCADE',
     nullable: true,
   })
-  @JoinColumn()
+  @JoinColumn({ name: 'ParentCommentId' })
   parentComment: Comment;
 
   @Column({ type: 'varchar', length: 100, nullable: false })

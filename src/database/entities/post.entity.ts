@@ -20,7 +20,7 @@ export class Post {
   UserId: number;
 
   @ManyToOne(() => User, (user) => user.posts, { nullable: false })
-  @JoinColumn()
+  @JoinColumn({ name: 'UserId' }) // needs to be specified
   user: User;
 
   @Column({ type: 'varchar', length: 50, nullable: false })
