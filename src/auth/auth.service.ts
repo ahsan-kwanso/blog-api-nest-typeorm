@@ -33,10 +33,6 @@ export class AuthService {
     if (existingUser) {
       throw new UnauthorizedException('User already exists');
     }
-    const emailValidationStatus = await this.validateEmail(signupDto.email); // run python flask api for this
-    if (emailValidationStatus !== 'Email is Valid') {
-      return `Seems Like Email doesn't exist or not valid`;
-    }
     const user = this.userRepository.create({
       ...signupDto,
       isVerified: false, // User is not verified yet
@@ -48,18 +44,6 @@ export class AuthService {
 
     // Return a message to the user indicating that they need to verify their email
     return 'A verification code has been sent to your email. Please verify your account.';
-  }
-
-  private async validateEmail(email: string): Promise<string> {
-    try {
-      const response = await axios.post(process.env.pythonApiUrl!, {
-        email,
-      });
-      return response.data.result;
-    } catch (error) {
-      console.error('Error validating email:', error);
-      throw new Error('Failed to validate email');
-    }
   }
 
   private async sendVerificationEmail(
