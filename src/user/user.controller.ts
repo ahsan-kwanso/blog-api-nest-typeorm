@@ -17,7 +17,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { PaginationQueryDto } from '../post/dto/pagination.dto';
+import { PaginationQueryDto } from '../common/pagination.dto';
 import { Request as ExpressRequest } from 'express';
 import { Roles } from '../auth/roles.decorator';
 import { Role } from 'src/types/role.enum';

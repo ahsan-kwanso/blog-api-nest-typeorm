@@ -13,7 +13,7 @@ export class UrlGeneratorService {
 
     const baseUrl = `${req.protocol}://${req.get('host')}${req.originalUrl.split('?')[0]}`;
 
-    // Append pagination parameters to the existing query string
+    // Append pagination parameters to the existing query string, not needed
     const queryParams = qs.stringify({
       ...req.query,
       page: nextPage,

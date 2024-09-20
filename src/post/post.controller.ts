@@ -12,7 +12,7 @@ import {
   Put,
 } from '@nestjs/common';
 import { Request as ExpressRequest } from 'express';
-import { PaginationQueryDto } from './dto/pagination.dto';
+import { PaginationQueryDto } from '../common/pagination.dto';
 import { PostService } from './post.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
@@ -97,9 +97,11 @@ export class PostController {
     @Param('id', ParseIntPipe) id: number,
     @Body() updatePostDto: UpdatePostDto,
     @Req() req: ExpressRequest,
-  ): Promise<PostModel> {
+  ): Promise<{ message: string }> {
     const userId = req.user.id; // Extract userId from the JWT
-    return await this.postService.update(id, updatePostDto, userId);
+    return {
+      message: await this.postService.update(id, updatePostDto, userId),
+    };
   }
 
   // Delete a post by ID (only if the user owns the post)
@@ -109,9 +111,9 @@ export class PostController {
   async remove(
     @Param('id', ParseIntPipe) id: number,
     @Req() req: ExpressRequest,
-  ): Promise<void> {
+  ): Promise<{ message: string }> {
     const userId = req.user.id; // Extract userId from the JWT;
     const role = req.user.role;
-    return await this.postService.remove(id, userId, role);
+    return { message: await this.postService.remove(id, userId, role) };
   }
 }

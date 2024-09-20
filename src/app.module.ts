@@ -7,17 +7,17 @@ import {
 } from '@nestjs/common';
 import { APP_PIPE, APP_GUARD } from '@nestjs/core';
 import { DatabaseModule } from './modules/database.module';
-import { UserModule } from './modules/user/user.module';
-import { PostModule } from './modules/post/post.module';
-import { CommentModule } from './modules/comment/comment.module';
-import { AuthModule } from './modules/auth/auth.module';
-import { AuthMiddleware } from './modules/auth/auth.middleware';
-import { RolesGuard } from './modules/auth/roles.guard';
+import { UserModule } from './user/user.module';
+import { PostModule } from './post/post.module';
+import { CommentModule } from './comment/comment.module';
+import { AuthModule } from './auth/auth.module';
+import { AuthMiddleware } from './auth/auth.middleware';
+import { RolesGuard } from './auth/roles.guard';
 import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true }),
+    ConfigModule.forRoot({ isGlobal: true }), // validation for config
     DatabaseModule, // Add DatabaseModule here
     UserModule,
     PostModule,

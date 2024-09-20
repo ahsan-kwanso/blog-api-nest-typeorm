@@ -165,3 +165,72 @@ All done what was required, so now will go through the code and study the concep
 
 
 getRawMany will only return selected entities from table while getMany will return the whole instance of entities means all columns will be included
+
+
+keep async await managed
+
+
+/*
+/ package.json explore
+// dependency injection
+// lifecycle
+// .service usage
+// ctx wokring and usage
+// status codes
+// pipe : messages, validations, global valiator
+// restructure guards, don't use filter in guards but in service
+// token verificaiton in guards
+// Reflect Metadata
+// don't use separate queries, create a single
+// Transform before IsInt, sequence checking, also tell the max limit
+// create separate folder for common
+// check for await keyword
+// file format validation using custom inteceptor
+// decorator for param validation
+// AWS v3 usage instead of v2
+// separate classes, cat, uat
+// validation in entities,
+// write the subscriber
+// usage of join column, only use when column name is different,it is must in one-to-one relationship.
+// define Cascade relationship
+// do not use name of column with @Column, not recommended
+// define default port instead of using !,
+// app.module validation for configuration, everything should come from same configuration.
+// create provider if you want to use async, or use useclass and providers should be separate
+// use query builder as minimal as possible
+// don't format date in backend
+// don't fetch user relation on updating the post
+// make the common ENUM, create a separate table for roles
+// modules should not be under separate folder
+// migration commands
+// decorators explanation, use custom decorator
+
+
+
+complete these things and commented parts of code
+*/
+
+
+/*
+First following my flow --- done
+change entities remove unnecessary code --- done
+synchronize db and check if everything is right --- done
+change package json and create migrations you should give your file name  --- done
+see default pacakage included and all scripts definition in package.json  --- done
+see all the work of async await see github repo of someone and then proceed --- done
+After this remove modules to outside  --- done
+update feature should return just messages
+make some thing for env config like what and how
+then head to chat and see what was Suggested
+then move auth to user module
+see what was asked for files and remove that Pipe as well
+then after working on all recommendations change the schema for db like separate table for roles now
+and write the subscribers then for those validate and encrypting the password
+move entities to modules then
+move types to dtos in modules
+see about rxjs as well
+don't use whole request get id just like thing see in commented code
+that thing of instance creation as well when repository is injected
+modify that edit and delete response as well
+modify frontend to send only the token
+*/

@@ -14,7 +14,7 @@ import { CreateCommentDto } from './dto/create-comment.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';
 import { Comment } from 'src/database/entities/comment.entity';
 import { Request } from 'express';
-import { CommentData, CommentsResult } from 'src/types/comment';
+import { CommentsResult } from 'src/types/comment';
 
 @Controller('comments')
 export class CommentController {
@@ -51,17 +51,19 @@ export class CommentController {
     @Param('id', ParseIntPipe) id: number,
     @Body() updateCommentDto: UpdateCommentDto,
     @Req() req: Request,
-  ): Promise<Comment> {
+  ): Promise<{ message: string }> {
     const userId = req.user.id; // Extract UserId from JWT token
-    return await this.commentService.update(id, updateCommentDto, userId);
+    return {
+      message: await this.commentService.update(id, updateCommentDto, userId),
+    };
   }
 
   @Delete(':id')
   async remove(
     @Param('id', ParseIntPipe) id: number,
     @Req() req: Request,
-  ): Promise<void> {
+  ): Promise<{ message: string }> {
     const userId = req.user.id; // Extract UserId from JWT token
-    return await this.commentService.remove(id, userId);
+    return { message: await this.commentService.remove(id, userId) };
   }
 }

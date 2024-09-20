@@ -142,7 +142,7 @@ export class CommentService {
     id: number,
     updateCommentDto: UpdateCommentDto,
     UserId: number,
-  ): Promise<Comment> {
+  ): Promise<string> {
     const comment = await this.findOne(id);
 
     // Check if the user owns the comment
@@ -154,10 +154,10 @@ export class CommentService {
 
     Object.assign(comment, updateCommentDto);
     await this.commentRepository.save(comment);
-    return comment;
+    return 'Comment updated successfully';
   }
 
-  async remove(id: number, UserId: number): Promise<void> {
+  async remove(id: number, UserId: number): Promise<string> {
     const comment = await this.findOne(id);
 
     // Check if the user owns the comment
@@ -168,5 +168,6 @@ export class CommentService {
     }
 
     await this.commentRepository.remove(comment);
+    return 'Comment deleted successfully';
   }
 }

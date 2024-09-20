@@ -199,11 +199,10 @@ export class PostService {
     id: number,
     updatePostDto: UpdatePostDto,
     userId: number,
-  ): Promise<Post> {
+  ): Promise<string> {
     // Fetch the post by its ID
     const post = await this.postRepository.findOne({
       where: { id },
-      relations: ['user'], // Include user relation if necessary for permission check, just show update message, not needed for fetch relation
     });
 
     // Handle case where the post was not found
@@ -212,7 +211,7 @@ export class PostService {
     }
 
     // Check if the user owns the post
-    if (post.user.id !== userId) {
+    if (post.UserId !== userId) {
       throw new ForbiddenException(
         'You do not have permission to update this post',
       );
@@ -224,14 +223,13 @@ export class PostService {
     // Save the updated post
     await this.postRepository.save(post);
 
-    return post;
+    return 'Post updated successfully';
   }
 
-  async remove(id: number, userId: number, userRole: Role): Promise<void> {
+  async remove(id: number, userId: number, userRole: Role): Promise<string> {
     // Fetch the post by its ID
     const post = await this.postRepository.findOne({
       where: { id },
-      relations: ['user'], // Include user relation if necessary for permission check
     });
 
     // Handle case where the post was not found
@@ -242,11 +240,11 @@ export class PostService {
     // If the user is an admin, allow deletion
     if (userRole === Role.ADMIN) {
       await this.postRepository.remove(post);
-      return;
+      return 'Post deleted successfully';
     }
 
     // Check if the user owns the post
-    if (post.user.id !== userId) {
+    if (post.UserId !== userId) {
       throw new ForbiddenException(
         'You do not have permission to delete this post',
       );
@@ -254,5 +252,6 @@ export class PostService {
 
     // Delete the post
     await this.postRepository.remove(post);
+    return 'Post deleted successfully';
   }
 }

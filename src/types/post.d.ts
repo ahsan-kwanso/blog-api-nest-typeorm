@@ -34,6 +34,7 @@ interface ErrorResponse {
 }
 
 // Paginated Posts Response
+// generic for this like pass data
 interface PaginatedPostsResponse {
   success?: boolean;
   posts: PostResponse[];
@@ -47,7 +48,7 @@ interface PaginatedPostsResponse {
 interface PostResult {
   success: boolean;
   message?: string;
-  post?: object; // Use the Post type here
+  post?: Post; // Use the Post type here
 }
 
 interface PostsResult {
@@ -57,5 +58,5 @@ interface PostsResult {
   page?: number;
   pageSize?: number;
   nextPage?: string | null;
-  posts?: object[]; // Use the Post type here
+  posts?: Post[]; // Use the Post type here
 }
