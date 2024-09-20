@@ -4,7 +4,9 @@ import {
   ArgumentsHost,
   BadRequestException,
   HttpException,
+  HttpStatus,
 } from '@nestjs/common';
+
 import { Request, Response } from 'express';
 
 @Catch(HttpException, BadRequestException)
@@ -18,11 +20,11 @@ export class HttpExceptionFilter implements ExceptionFilter {
 
     // If the response is a validation error, format it accordingly
     if (
-      status === 400 &&
+      status === HttpStatus.BAD_REQUEST &&
       typeof exceptionResponse === 'object' &&
       'message' in exceptionResponse
     ) {
-      response.status(status).json({
+      return response.status(status).json({
         statusCode: status,
         timestamp: new Date().toISOString(),
         path: request.url,
@@ -35,7 +37,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
           ? exceptionResponse['message']
           : exception.message || 'Internal server error';
 
-      response.status(status).json({
+      return response.status(status).json({
         statusCode: status,
         timestamp: new Date().toISOString(),
         path: request.url,
