@@ -125,7 +125,7 @@ export class CommentService {
   }
 
   async findAll(): Promise<Comment[]> {
-    return this.commentRepository.find();
+    return await this.commentRepository.find();
   }
 
   async findOne(id: number): Promise<Comment> {
