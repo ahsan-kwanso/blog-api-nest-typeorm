@@ -39,7 +39,7 @@ export class PostService {
   }
 
   async findAll(): Promise<Post[]> {
-    return this.postRepository.find();
+    return await this.postRepository.find();
   }
 
   async getPosts(
@@ -48,7 +48,7 @@ export class PostService {
     req: ExpressRequest,
   ): Promise<PaginatedPostsResponse> {
     // Call common logic with no specific user filtering
-    return this.fetchPosts(null, page, limit, req);
+    return await this.fetchPosts(null, page, limit, req);
   }
 
   async getMyPosts(
@@ -63,7 +63,7 @@ export class PostService {
     }
 
     // Call common logic with user filtering
-    return this.fetchPosts(userId, page, limit, req);
+    return await this.fetchPosts(userId, page, limit, req);
   }
 
   /**
@@ -79,7 +79,7 @@ export class PostService {
     const pageSize = Number(limit);
     const pageNumber = Number(page);
 
-    // Define a base query
+    // Define a base query, use query builder less
     const query = this.postRepository
       .createQueryBuilder('post')
       .leftJoinAndSelect('post.user', 'user') // Eager load the user relation
@@ -98,10 +98,10 @@ export class PostService {
     // Map posts to the required format
     const formattedPosts: PostResponse[] = posts.map((post) => ({
       id: post.id,
-      author: post.user?.name || 'Unknown', // Access the user's name
+      author: post.user?.name, // Access the user's name
       title: post.title,
       content: post.content,
-      date: post.updatedAt?.toISOString().split('T')[0], // Format date as YYYY-MM-DD
+      date: post.updatedAt?.toISOString().split('T')[0], // Format date as YYYY-MM-DD, just format on frontend
     }));
 
     // Calculate pagination details
@@ -203,7 +203,7 @@ export class PostService {
     // Fetch the post by its ID
     const post = await this.postRepository.findOne({
       where: { id },
-      relations: ['user'], // Include user relation if necessary for permission check
+      relations: ['user'], // Include user relation if necessary for permission check, just show update message, not needed for fetch relation
     });
 
     // Handle case where the post was not found

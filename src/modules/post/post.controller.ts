@@ -31,14 +31,8 @@ export class PostController {
     @Req() req: ExpressRequest,
   ): Promise<PostModel> {
     const userId = req.user.id; // Extract userId from the JWT
-    return this.postService.create(createPostDto, userId);
+    return await this.postService.create(createPostDto, userId);
   }
-
-  // Get all posts
-  // @Get()
-  // async findAll(): Promise<PostModel[]> {
-  //   return this.postService.findAll();
-  // }
 
   @UseGuards(JwtConditionalAuthGuard) // as I have removed middlware authentication so this will check if filter is passed because in that case authentication is required
   @Get()
@@ -49,14 +43,14 @@ export class PostController {
     @Req() req: ExpressRequest, // Add the request object
   ): Promise<PaginatedPostsResponse> {
     if (filter === 'my-posts' && userId) {
-      return this.postService.getMyPosts(
+      return await this.postService.getMyPosts(
         parseInt(userId),
         paginationQuery.page,
         paginationQuery.limit,
         req,
       );
     } else {
-      return this.postService.getPosts(
+      return await this.postService.getPosts(
         paginationQuery.page,
         paginationQuery.limit,
         req,
@@ -74,7 +68,7 @@ export class PostController {
     @Req() req: ExpressRequest,
   ): Promise<PaginatedPostsResponse> {
     if (filter === 'my-posts' && userId) {
-      return this.postService.searchPosts(
+      return await this.postService.searchPosts(
         title,
         paginationQuery.page,
         paginationQuery.limit,
@@ -82,7 +76,7 @@ export class PostController {
         parseInt(userId),
       );
     } else {
-      return this.postService.searchPosts(
+      return await this.postService.searchPosts(
         title,
         paginationQuery.page,
         paginationQuery.limit,
@@ -105,7 +99,7 @@ export class PostController {
     @Req() req: ExpressRequest,
   ): Promise<PostModel> {
     const userId = req.user.id; // Extract userId from the JWT
-    return this.postService.update(id, updatePostDto, userId);
+    return await this.postService.update(id, updatePostDto, userId);
   }
 
   // Delete a post by ID (only if the user owns the post)
@@ -118,6 +112,6 @@ export class PostController {
   ): Promise<void> {
     const userId = req.user.id; // Extract userId from the JWT;
     const role = req.user.role;
-    return this.postService.remove(id, userId, role);
+    return await this.postService.remove(id, userId, role);
   }
 }
