@@ -26,24 +26,24 @@ export class CommentController {
     @Req() req: Request,
   ): Promise<Comment> {
     const userId = req.user.id; // Extract UserId from JWT token
-    return this.commentService.create(createCommentDto, userId);
+    return await this.commentService.create(createCommentDto, userId);
   }
 
   @Get()
   async findAll(): Promise<Comment[]> {
-    return this.commentService.findAll();
+    return await this.commentService.findAll();
   }
 
   @Get('/post/:id')
   async findCommentsOnPost(
     @Param('id', ParseIntPipe) id: number,
   ): Promise<CommentsResult> {
-    return this.commentService.findAllByPostId(id);
+    return await this.commentService.findAllByPostId(id);
   }
 
   @Get(':id')
   async findOne(@Param('id', ParseIntPipe) id: number): Promise<Comment> {
-    return this.commentService.findOne(id);
+    return await this.commentService.findOne(id);
   }
 
   @Put(':id')
@@ -53,7 +53,7 @@ export class CommentController {
     @Req() req: Request,
   ): Promise<Comment> {
     const userId = req.user.id; // Extract UserId from JWT token
-    return this.commentService.update(id, updateCommentDto, userId);
+    return await this.commentService.update(id, updateCommentDto, userId);
   }
 
   @Delete(':id')
@@ -62,6 +62,6 @@ export class CommentController {
     @Req() req: Request,
   ): Promise<void> {
     const userId = req.user.id; // Extract UserId from JWT token
-    return this.commentService.remove(id, userId);
+    return await this.commentService.remove(id, userId);
   }
 }
