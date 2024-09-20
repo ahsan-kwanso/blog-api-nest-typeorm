@@ -15,31 +15,31 @@ export class Comment {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ name: 'UserId', type: 'int', nullable: false })
+  @Column({ type: 'int', nullable: false }) //don't define column name
   UserId: number;
 
   @ManyToOne(() => User, (user) => user.comments, { nullable: false })
-  @JoinColumn({ name: 'UserId' })
+  @JoinColumn()
   user: User;
 
-  @Column({ name: 'PostId', type: 'int', nullable: false })
+  @Column({ type: 'int', nullable: false })
   PostId: number;
 
   @ManyToOne(() => Post, (post) => post.comments, {
     onDelete: 'CASCADE',
     nullable: false,
   })
-  @JoinColumn({ name: 'PostId' })
+  @JoinColumn()
   post: Post;
 
-  @Column({ name: 'ParentCommentId', type: 'int', nullable: true })
+  @Column({ type: 'int', nullable: true })
   ParentCommentId: number;
 
   @ManyToOne(() => Comment, (comment) => comment.childComments, {
     onDelete: 'CASCADE',
     nullable: true,
   })
-  @JoinColumn({ name: 'ParentCommentId' })
+  @JoinColumn()
   parentComment: Comment;
 
   @Column({ type: 'varchar', length: 100, nullable: false })
@@ -48,9 +48,9 @@ export class Comment {
   // Define the relation if comments can have child comments
   childComments: Comment[];
 
-  @CreateDateColumn({ name: 'createdAt' })
+  @CreateDateColumn()
   createdAt: Date;
 
-  @UpdateDateColumn({ name: 'updatedAt' })
+  @UpdateDateColumn()
   updatedAt: Date;
 }

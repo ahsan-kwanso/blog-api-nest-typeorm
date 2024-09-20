@@ -17,9 +17,11 @@ enum Role {
   ADMIN = 'admin',
 }
 
-@Entity({ name: 'Users' }) // Specify table name if needed
+// separate table for role
+
+@Entity({ name: 'Users' }) // Specify table name if needed, make common id , cat,uat separate class
 export class User {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn() // see about uuid
   id: number;
 
   @Column({ type: 'varchar', length: 50, nullable: false })
@@ -51,14 +53,15 @@ export class User {
   verificationCode: string;
 
   @Column({ type: 'varchar', length: 255, nullable: true })
-  profilePictureUrl: string | null; // New column for profile picture URL
+  profilePictureUrl: string; // New column for profile picture URL
 
-  @CreateDateColumn({ name: 'createdAt' })
+  @CreateDateColumn()
   createdAt: Date;
 
-  @UpdateDateColumn({ name: 'updatedAt' })
+  @UpdateDateColumn()
   updatedAt: Date;
 
+  //separate subscriber for this and move validate password to helper
   @BeforeInsert()
   @BeforeUpdate()
   async hashPassword(): Promise<void> {

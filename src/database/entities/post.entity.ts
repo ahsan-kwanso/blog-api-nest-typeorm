@@ -16,11 +16,11 @@ export class Post {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ name: 'UserId', type: 'int', nullable: false })
+  @Column({ type: 'int', nullable: false })
   UserId: number;
 
   @ManyToOne(() => User, (user) => user.posts, { nullable: false })
-  @JoinColumn({ name: 'UserId' })
+  @JoinColumn()
   user: User;
 
   @Column({ type: 'varchar', length: 50, nullable: false })
@@ -32,9 +32,9 @@ export class Post {
   @OneToMany(() => Comment, (comment) => comment.post)
   comments: Comment[];
 
-  @CreateDateColumn({ name: 'createdAt' })
+  @CreateDateColumn()
   createdAt: Date;
 
-  @UpdateDateColumn({ name: 'updatedAt' })
+  @UpdateDateColumn()
   updatedAt: Date;
 }
