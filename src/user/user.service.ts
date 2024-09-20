@@ -17,8 +17,7 @@ import paginationConfig from 'src/utils/pagination.config';
 import { Request as ExpressRequest } from 'express';
 import { UrlGeneratorService } from 'src/utils/pagination.util';
 import { Repository } from 'typeorm';
-import { s3 } from 'src/config/s3.config'; // Import S3 configuration
-import { v4 as uuidv4 } from 'uuid'; // For generating unique file names
+import { FileUploadService } from 'src/thirdParty/s3/file-upload.service';
 
 @Injectable()
 export class UserService {
@@ -32,6 +31,7 @@ export class UserService {
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
     private readonly urlGeneratorService: UrlGeneratorService,
+    private readonly fileUploadService: FileUploadService,
   ) {}
 
   async create(createUserDto: Partial<CreateUserDto>): Promise<User> {
@@ -250,31 +250,19 @@ export class UserService {
       throw new ForbiddenException('File size exceeds 10MB.');
     }
 
-    const fileName = `${uuidv4()}-${file.originalname}`;
-    const fileKey = `profile-pictures/${fileName}`;
-
     try {
-      await s3
-        .upload({
-          Bucket: process.env.AWS_S3_BUCKET_NAME!,
-          Key: fileKey,
-          Body: file.buffer,
-          ContentType: file.mimetype,
-        })
-        .promise();
+      // Use FileUploadService to upload file and get the file key
+      const fileKey = await this.fileUploadService.uploadFile(file);
 
-      const signedUrl = s3.getSignedUrl('getObject', {
-        Bucket: process.env.AWS_S3_BUCKET_NAME!,
-        Key: fileKey,
-        Expires: 6000 * 6000, // URL validity time
-      });
+      // Get signed URL
+      const signedUrl = await this.fileUploadService.getSignedUrlS(fileKey);
 
       user.profilePictureUrl = signedUrl;
       await this.userRepository.save(user);
 
       return user;
     } catch (error) {
-      throw new InternalServerErrorException('Error uploading file to S3');
+      throw new InternalServerErrorException('Error uploading profile picture');
     }
   }
 }

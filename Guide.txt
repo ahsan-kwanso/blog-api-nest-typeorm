@@ -219,7 +219,7 @@ change package json and create migrations you should give your file name  --- do
 see default pacakage included and all scripts definition in package.json  --- done
 see all the work of async await see github repo of someone and then proceed --- done
 After this remove modules to outside  --- done
-update feature should return just messages
+update feature should return just messages --- done
 make some thing for env config like what and how
 then head to chat and see what was Suggested
 then move auth to user module
@@ -233,4 +233,6 @@ don't use whole request get id just like thing see in commented code
 that thing of instance creation as well when repository is injected
 modify that edit and delete response as well
 modify frontend to send only the token
+how to enforce that .service .controller file extension
+make separate modules for email and file upload
 */
