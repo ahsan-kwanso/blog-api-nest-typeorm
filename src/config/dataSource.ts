@@ -4,11 +4,11 @@ import { DataSource } from 'typeorm';
 
 export default new DataSource({
   type: 'postgres',
-  host: process.env.DB_HOST,
-  port: +process.env.DB_PORT!,
-  username: process.env.DB_USERNAME,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
+  host: process.env.DB_HOST || 'localhost', // Default host
+  port: +process.env.DB_PORT! || 5432, // Default PostgreSQL port
+  username: process.env.DB_USERNAME || 'default_user', // Default username
+  password: process.env.DB_PASSWORD || 'default_password', // Default password
+  database: process.env.DB_NAME || 'default_db', // Default database name
   synchronize: false,
   dropSchema: false,
   logging: false,
