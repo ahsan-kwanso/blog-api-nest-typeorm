@@ -83,3 +83,51 @@ Brief Use Cases
     typeorm-naming-strategies: Customizes naming strategies for TypeORM entities.
 
 This is some basic features these dependencies are providing
+
+
+
+Now some scripts related to typeorm
+
+1. "schema:sync"
+
+    Command: npx typeorm-ts-node-commonjs schema:sync
+    Description: Synchronizes the database schema with the current entities. It will create or update tables based on the current model definitions in your application. This is useful during development but not recommended for production.
+
+2. "typeorm:cache"
+
+    Command: npx typeorm-ts-node-commonjs cache:clear
+    Description: Clears the cache of TypeORM. This can be useful if you've made changes that you expect to be reflected in the cached queries.
+
+3. "schema:drop"
+
+    Command: npx typeorm-ts-node-commonjs -d ./src/config/dataSource.ts
+    Description: Drops the entire database schema. This will remove all tables and data. Use with caution, especially in production environments.
+
+4. "migration:create"
+
+    Command: typeorm migration:create ./src/database/migrations/$NAME --timestamp
+    Description: Creates a new migration file with the specified name. This file will be empty and ready for you to define the changes you want to apply to your database schema.
+
+5. "migration:generate"
+
+    Command: npx typeorm-ts-node-commonjs migration:generate ./src/database/migrations/$NAME --timestamp -d ./src/config/dataSource.ts
+    Description: Generates a new migration file based on the current state of the database and the entities. It will compare the current schema with your entities and create a migration file that represents the changes needed to sync them.
+
+6. "migration:show"
+
+    Command: npx typeorm-ts-node-commonjs migration:show -d ./src/config/dataSource.ts
+    Description: Displays the list of migrations that have been applied and those that are pending. This helps in tracking the migration status.
+
+7. "migration:run"
+
+    Command: npx typeorm-ts-node-commonjs migration:run -d ./src/config/dataSource.ts
+    Description: Executes the pending migrations. This applies changes defined in migration files to the database schema.
+
+8. "migration:revert"
+
+    Command: npx typeorm-ts-node-commonjs migration:revert -d ./src/config/dataSource.ts
+    Description: Reverts the last executed migration, undoing the changes made to the database schema. This is useful for rolling back changes if needed.
+
+Summary
+
+These scripts provide a comprehensive toolkit for managing your database schema with TypeORM, allowing you to synchronize, create, and run migrations effectively while also managing your database's state throughout development and deployment.
