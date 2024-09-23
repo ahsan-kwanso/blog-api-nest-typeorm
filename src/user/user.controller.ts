@@ -36,7 +36,7 @@ export class UserController {
   @Get('/v1')
   @Roles(Role.ADMIN)
   async findAll() {
-    return this.userService.findAll();
+    return await this.userService.findAll();
   }
 
   @Get()
@@ -69,7 +69,7 @@ export class UserController {
 
   @Get(':id')
   async findOne(@Param('id', ParseIntPipe) id: string) {
-    return this.userService.findOne(+id);
+    return await this.userService.findOne(+id);
   }
 
   @Patch(':id')
@@ -85,7 +85,7 @@ export class UserController {
 
   @Delete(':id')
   async remove(@Param('id', ParseIntPipe) id: string) {
-    return this.userService.remove(+id);
+    return await this.userService.remove(+id);
   }
 
   // file format validation, create custom interceptor inside use interceptor

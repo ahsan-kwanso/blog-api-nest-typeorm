@@ -88,7 +88,7 @@ export class PostController {
   // Get a single post by ID
   @Get(':id')
   async findOne(@Param('id', ParseIntPipe) id: number): Promise<PostModel> {
-    return this.postService.findOne(id);
+    return await this.postService.findOne(id);
   }
 
   // Update a post by ID (only if the user owns the post)
