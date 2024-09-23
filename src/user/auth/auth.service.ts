@@ -13,6 +13,7 @@ import { LoginDto } from './dto/login.dto';
 import { generateToken } from 'src/utils/jwt.util';
 import * as sgMail from '@sendgrid/mail';
 import { EmailService } from 'src/thirdParty/sg/email.service';
+import { PasswordHelper } from './password.helper';
 dotenv.config();
 
 @Injectable()
@@ -21,6 +22,7 @@ export class AuthService {
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
     private readonly emailService: EmailService,
+    private readonly passwordHelper: PasswordHelper,
   ) {
     sgMail.setApiKey(process.env.SENDGRID_API_KEY!);
   }
@@ -85,13 +87,18 @@ export class AuthService {
       ], // Manually select password
     });
 
-    if (!user || !(await user.validatePassword(loginDto.password))) {
+    if (
+      !user ||
+      !(await this.passwordHelper.validatePassword(
+        loginDto.password,
+        user.password,
+      ))
+    ) {
       throw new UnauthorizedException('Invalid credentials');
     }
 
     if (user && !user.isVerified) {
       const verificationCode: string = user.verificationCode;
-      console.log(verificationCode);
       await this.emailService.sendVerificationEmail(
         user.email,
         verificationCode,

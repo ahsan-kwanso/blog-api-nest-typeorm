@@ -231,12 +231,12 @@ use some package for status codes ---- done
 move types to dtos in modules ---- done
 see about rxjs as well  ---- done
 don't use whole request get id just like thing see in commented code ---- done
-that thing of instance creation as well when repository is injected
+that thing of instance creation as well when repository is injected ---- done
 modify that edit and delete response as   ---- done
 modify frontend to send only the token --- will be using the link to verify
 how to enforce that .service .controller file extension ---- done, you can use es-lint to enforce such behaviours
 make separate modules for email and file upload ----file module separated now separat send mail module ---- done
-update your dto of pagination acc to feedback
+update your dto of pagination acc to feedback --- done
 that file size handling in controller don't use that in service ---- done
 see for that whitelist arg when get time --- as I have not defined dtos for some so I have set it to false currently
 */
@@ -264,3 +264,6 @@ will implementation verification link technique, i think that will be better
 Which type of interactivity needed so that we need CSR
 middleware application otherways
 */
+
+
+now upto subscribers thing and then will see separate role table then will see the link verification then will see UI update like handle that sidebar thing

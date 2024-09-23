@@ -60,19 +60,4 @@ export class User {
 
   @UpdateDateColumn()
   updatedAt: Date;
-
-  //separate subscriber for this and move validate password to helper
-  @BeforeInsert()
-  @BeforeUpdate()
-  async hashPassword(): Promise<void> {
-    if (this.password) {
-      const salt = await bcrypt.genSalt(10);
-      this.password = await bcrypt.hash(this.password, salt);
-    }
-  }
-
-  // Method to validate password during login
-  async validatePassword(password: string): Promise<boolean> {
-    return bcrypt.compare(password, this.password);
-  }
 }

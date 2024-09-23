@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigService } from '@nestjs/config';
+import { UserSubscriber } from 'src/user/user.subscriber';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { ConfigService } from '@nestjs/config';
             migrationsDir: __dirname + '/migrations/',
           },
           logging: true,
+          subscribers: [UserSubscriber], // Add the subscriber(s) here
         };
       },
       inject: [ConfigService],
