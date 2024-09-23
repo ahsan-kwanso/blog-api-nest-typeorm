@@ -230,15 +230,15 @@ move entities to modules then ---- done
 use some package for status codes ---- done
 move types to dtos in modules ---- done
 see about rxjs as well  ---- done
-don't use whole request get id just like thing see in commented code
+don't use whole request get id just like thing see in commented code ---- done
 that thing of instance creation as well when repository is injected
 modify that edit and delete response as   ---- done
 modify frontend to send only the token --- will be using the link to verify
 how to enforce that .service .controller file extension ---- done, you can use es-lint to enforce such behaviours
 make separate modules for email and file upload ----file module separated now separat send mail module ---- done
 update your dto of pagination acc to feedback
-that file size handling in controller don't use that in service
-see for that whitelist arg when get time
+that file size handling in controller don't use that in service ---- done
+see for that whitelist arg when get time --- as I have not defined dtos for some so I have set it to false currently
 */
 
 
