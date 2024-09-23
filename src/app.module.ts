@@ -10,9 +10,9 @@ import { DatabaseModule } from './modules/database.module';
 import { UserModule } from './user/user.module';
 import { PostModule } from './post/post.module';
 import { CommentModule } from './comment/comment.module';
-import { AuthModule } from './auth/auth.module';
-import { AuthMiddleware } from './auth/auth.middleware';
-import { RolesGuard } from './auth/roles.guard';
+import { AuthModule } from './user/auth/auth.module';
+import { AuthMiddleware } from './user/auth/auth.middleware';
+import { RolesGuard } from './user/auth/roles.guard';
 import { ConfigModule } from '@nestjs/config';
 
 @Module({

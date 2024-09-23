@@ -226,7 +226,7 @@ then move auth to user module
 see what was asked for files and remove that Pipe as well
 then after working on all recommendations change the schema for db like separate table for roles now
 and write the subscribers then for those validate and encrypting the password
-move entities to modules then
+move entities to modules then ---- done
 move types to dtos in modules
 see about rxjs as well  ---- done
 don't use whole request get id just like thing see in commented code
@@ -235,7 +235,6 @@ modify that edit and delete response as   ---- done
 modify frontend to send only the token
 how to enforce that .service .controller file extension
 make separate modules for email and file upload ----file module separated now separat send mail module ---- done
-move types to dtos
 */
 
 
