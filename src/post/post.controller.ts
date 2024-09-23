@@ -19,6 +19,9 @@ import { UpdatePostDto } from './dto/update-post.dto';
 import { Post as PostModel } from 'src/post/post.entity';
 import { PaginatedPostsResponse } from './dto/post';
 import { JwtConditionalAuthGuard } from '../user/auth/jwt.auth.guard';
+import { LoggedInUserId } from 'src/common/LoggedInUserId.decorator';
+import { LoggedInUserRole } from 'src/common/LoggedInUserRole.decorator';
+import { Role } from 'src/user/dto/role.enum';
 
 @Controller('posts')
 export class PostController {
@@ -28,9 +31,8 @@ export class PostController {
   @Post()
   async create(
     @Body() createPostDto: CreatePostDto,
-    @Req() req: ExpressRequest,
+    @LoggedInUserId() userId: number,
   ): Promise<PostModel> {
-    const userId = req.user.id; // Extract userId from the JWT
     return await this.postService.create(createPostDto, userId);
   }
 
@@ -96,24 +98,19 @@ export class PostController {
   async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updatePostDto: UpdatePostDto,
-    @Req() req: ExpressRequest,
+    @LoggedInUserId() userId: number,
   ): Promise<{ message: string }> {
-    const userId = req.user.id; // Extract userId from the JWT
     return {
       message: await this.postService.update(id, updatePostDto, userId),
     };
   }
 
-  // Delete a post by ID (only if the user owns the post)
-  // @UseGuards(RolesGuard) // Apply guards
-  // @Roles(Role.USER, Role.ADMIN) // Only admin users can delete posts
   @Delete(':id')
   async remove(
     @Param('id', ParseIntPipe) id: number,
-    @Req() req: ExpressRequest,
+    @LoggedInUserId() userId: number,
+    @LoggedInUserRole() userRole: Role,
   ): Promise<{ message: string }> {
-    const userId = req.user.id; // Extract userId from the JWT;
-    const role = req.user.role;
-    return { message: await this.postService.remove(id, userId, role) };
+    return { message: await this.postService.remove(id, userId, userRole) };
   }
 }
