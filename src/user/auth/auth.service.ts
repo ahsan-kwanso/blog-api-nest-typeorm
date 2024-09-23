@@ -28,7 +28,7 @@ export class AuthService {
   }
 
   async signup(signupDto: SignupDto): Promise<string> {
-    const verificationCode = crypto.randomBytes(3).toString('hex'); // Generate a 6-character code
+    const verificationToken = crypto.randomBytes(32).toString('hex'); // Generate a 6-character code
 
     const existingUser = await this.userRepository.findOneBy({
       email: signupDto.email,
@@ -39,38 +39,39 @@ export class AuthService {
     const user = this.userRepository.create({
       ...signupDto,
       isVerified: false, // User is not verified yet
-      verificationCode: verificationCode, // Store the verification code
+      verificationToken: verificationToken, // Store the verification code
     });
     // Send the verification code to the user's email
+    const verificationLink = `${process.env.APP_URL}/verify-email?token=${verificationToken}`;
     await this.emailService.sendVerificationEmail(
       signupDto.email,
-      verificationCode,
+      verificationLink,
     );
     await this.userRepository.save(user);
 
     // Return a message to the user indicating that they need to verify their email
-    return 'A verification code has been sent to your email. Please verify your account.';
+    return 'A verification link has been sent to your email. Please verify your account.';
   }
 
-  async verifyEmail(email: string, code: string): Promise<User | null> {
-    const user = await this.userRepository.findOne({ where: { email } });
+  async verifyEmail(token: string): Promise<User | null> {
+    const user = await this.userRepository.findOne({
+      where: { verificationToken: token },
+    });
 
     if (!user) {
-      throw new UnauthorizedException('User not found');
+      throw new BadRequestException('Invalid verification token.');
     }
+
     if (user.isVerified) {
-      throw new BadRequestException('Already Verified');
+      throw new BadRequestException('User is already verified.');
     }
-    if (user.verificationCode === code) {
+    if (user.verificationToken === token) {
       user.isVerified = true;
-      user.verificationCode = ''; // Clear the verification code after success
+      user.verificationToken = '';
       await this.userRepository.save(user);
       return user;
-    } else {
-      throw new BadRequestException(
-        'The verification code you entered is incorrect. Please try again.',
-      ); // Code mismatch
     }
+    return null;
   }
 
   async login(loginDto: LoginDto): Promise<string> {
@@ -83,7 +84,7 @@ export class AuthService {
         'password',
         'role',
         'isVerified',
-        'verificationCode',
+        'verificationToken',
       ], // Manually select password
     });
 
@@ -98,14 +99,15 @@ export class AuthService {
     }
 
     if (user && !user.isVerified) {
-      const verificationCode: string = user.verificationCode;
+      const verificationToken: string = user.verificationToken;
+      const verificationLink = `${process.env.APP_URL}/verify-email?token=${verificationToken}`;
       await this.emailService.sendVerificationEmail(
         user.email,
-        verificationCode,
+        verificationLink,
       );
 
       throw new UnauthorizedException(
-        'Email not verified. A verification code has been sent to your email.',
+        'Email not verified. A verification link has been sent to your email.',
       );
     }
 

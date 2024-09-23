@@ -3,12 +3,9 @@ import {
   PrimaryGeneratedColumn,
   Column,
   OneToMany,
-  BeforeInsert,
-  BeforeUpdate,
   CreateDateColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import * as bcrypt from 'bcrypt';
 import { Post } from '../post/post.entity';
 import { Comment } from '../comment/comment.entity';
 
@@ -50,7 +47,7 @@ export class User {
   isVerified: boolean;
 
   @Column({ nullable: true })
-  verificationCode: string;
+  verificationToken: string;
 
   @Column({ type: 'varchar', length: 550, nullable: true })
   profilePictureUrl: string; // New column for profile picture URL

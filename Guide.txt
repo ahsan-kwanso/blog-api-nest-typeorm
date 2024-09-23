@@ -266,4 +266,11 @@ middleware application otherways
 */
 
 
-now upto subscribers thing and then will see separate role table then will see the link verification then will see UI update like handle that sidebar thing
+now upto subscribers thing and then will see separate role table then will see the link verification then will see UI update like handle that sidebar thing.
+
+Will add the role table and that link verification later but currently make some thing out of that UI.
+Like sidebar thing, now I will be adding sidebar in layout, but instead of main page on all other pages just show home icon, instead of tabs of All Posts and My Posts, then later will see for optimization in design
+
+
+Back to backend 
+What is the remaining work, separate the user role table, but i think first should implement the link based verification, when this is completed then will see the UI and at the end start with that db schema update

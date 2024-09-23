@@ -21,10 +21,9 @@ export class AuthController {
 
   @Post('verify-email')
   async verifyEmail(
-    @Body('email') email: string,
-    @Body('code') code: string,
+    @Body('token') token: string,
   ): Promise<{ message: string }> {
-    const user = await this.authService.verifyEmail(email, code);
+    const user = await this.authService.verifyEmail(token);
     if (user) {
       return { message: 'Email successfully verified!' };
     } else {

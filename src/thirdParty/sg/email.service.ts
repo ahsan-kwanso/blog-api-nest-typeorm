@@ -9,13 +9,13 @@ export class EmailService {
     sgMail.setApiKey(this.configService.get<string>('SENDGRID_API_KEY')!);
   }
 
-  async sendVerificationEmail(email: string, code: string): Promise<void> {
+  async sendVerificationEmail(email: string, link: string): Promise<void> {
     const msg = {
       to: email,
-      from: this.configService.get<string>('SENDGRID_SENDER_EMAIL')!, // Use ConfigService to get sender email
+      from: this.configService.get<string>('SENDGRID_SENDER_EMAIL')!,
       subject: 'Verify Your Email Address',
-      text: `Please use the following verification code to verify your email: ${code}`,
-      html: `<p>Thank you for registering! Use the following code to verify your email:</p><h2>${code}</h2>`,
+      text: `Please click the following link to verify your email: ${link}`,
+      html: `<p>Thank you for registering! Click the following link to verify your email:</p><a href="${link}">${link}</a>`,
     };
 
     try {
