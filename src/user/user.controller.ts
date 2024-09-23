@@ -27,7 +27,12 @@ import { diskStorage } from 'multer';
 import { LoggedInUserId } from 'src/common/LoggedInUserId.decorator';
 
 const MAX_FILE_SIZE_MB = 10;
-const ALLOWED_MIME_TYPES = ['image/jpeg', 'image/png', 'image/gif'];
+const ALLOWED_MIME_TYPES = [
+  'image/jpeg',
+  'image/png',
+  'image/gif',
+  'image/jpg',
+];
 
 const fileFilter = (
   req: ExpressRequest,
@@ -114,7 +119,6 @@ export class UserController {
   @Post(':id/upload-profile-picture')
   @UseInterceptors(
     FileInterceptor('file', {
-      storage: diskStorage({}),
       fileFilter,
       limits,
     }),
