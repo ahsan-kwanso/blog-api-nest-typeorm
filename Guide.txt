@@ -228,7 +228,7 @@ then after working on all recommendations change the schema for db like separate
 and write the subscribers then for those validate and encrypting the password
 move entities to modules then ---- done
 use some package for status codes ---- done
-move types to dtos in modules
+move types to dtos in modules ---- done
 see about rxjs as well  ---- done
 don't use whole request get id just like thing see in commented code
 that thing of instance creation as well when repository is injected

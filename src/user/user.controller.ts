@@ -12,6 +12,7 @@ import {
   Query,
   UploadedFile,
   UseInterceptors,
+  BadRequestException,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { UserService } from './user.service';
@@ -22,6 +23,29 @@ import { Request as ExpressRequest } from 'express';
 import { Roles } from './auth/roles.decorator';
 import { Role } from 'src/user/dto/role.enum';
 import { RolesGuard } from './auth/roles.guard';
+import { diskStorage } from 'multer';
+import { LoggedInUserId } from 'src/common/LoggedInUserId.decorator';
+
+const MAX_FILE_SIZE_MB = 10;
+const ALLOWED_MIME_TYPES = ['image/jpeg', 'image/png', 'image/gif'];
+
+const fileFilter = (
+  req: ExpressRequest,
+  file: Express.Multer.File,
+  callback: (error: Error | null, acceptFile: boolean) => void,
+) => {
+  if (!ALLOWED_MIME_TYPES.includes(file.mimetype)) {
+    return callback(
+      new BadRequestException('Invalid file type. Only images are allowed.'),
+      false,
+    );
+  }
+  callback(null, true);
+};
+
+const limits = {
+  fileSize: MAX_FILE_SIZE_MB * 1024 * 1024, // Convert MB to bytes
+};
 
 @Controller('users')
 @UseGuards(RolesGuard)
@@ -62,8 +86,7 @@ export class UserController {
 
   // get the logged in user
   @Get('/me')
-  async currentUser(@Req() req: ExpressRequest) {
-    const UserId = req.user?.id;
+  async currentUser(@LoggedInUserId() UserId: number) {
     return await this.userService.getCurrentUser(UserId);
   }
 
@@ -77,9 +100,8 @@ export class UserController {
   async update(
     @Param('id', ParseIntPipe) id: string,
     @Body() updateUserDto: UpdateUserDto,
-    @Req() req: ExpressRequest,
+    @LoggedInUserId() adminId: number,
   ) {
-    const adminId = req.user.id;
     return await this.userService.update(+id, updateUserDto, adminId);
   }
 
@@ -90,17 +112,22 @@ export class UserController {
 
   // file format validation, create custom interceptor inside use interceptor
   @Post(':id/upload-profile-picture')
-  @UseInterceptors(FileInterceptor('file'))
+  @UseInterceptors(
+    FileInterceptor('file', {
+      storage: diskStorage({}),
+      fileFilter,
+      limits,
+    }),
+  )
   async uploadProfilePicture(
     @Param('id', ParseIntPipe) userId: number,
     @UploadedFile() file: Express.Multer.File,
-    @Req() req: ExpressRequest, // add custom decorator and then get user
+    @LoggedInUserId() loggedInUserId: number, // add custom decorator and then get user
   ) {
-    const loggedInUserId = req.user.id;
     const user = await this.userService.uploadProfilePicture(
-      Number(userId), // decorator for params validation don't pass Number(e.g)
+      userId,
       file,
-      Number(loggedInUserId),
+      loggedInUserId,
     );
     return { profilePictureUrl: user.profilePictureUrl };
   }

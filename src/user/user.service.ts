@@ -21,12 +21,6 @@ import { FileUploadService } from 'src/thirdParty/s3/file-upload.service';
 
 @Injectable()
 export class UserService {
-  private readonly MAX_FILE_SIZE_MB = 10; // Maximum file size in MB
-  private readonly ALLOWED_MIME_TYPES = [
-    'image/jpeg',
-    'image/png',
-    'image/gif',
-  ];
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
@@ -236,18 +230,6 @@ export class UserService {
 
     if (!user) {
       throw new NotFoundException('User not found');
-    }
-
-    if (!this.ALLOWED_MIME_TYPES.includes(file.mimetype)) {
-      throw new ForbiddenException(
-        'Invalid file type. Only images are allowed.',
-      );
-    }
-
-    // Validate file size
-    if (file.size > this.MAX_FILE_SIZE_MB * 1024 * 1024) {
-      // Convert MB to bytes
-      throw new ForbiddenException('File size exceeds 10MB.');
     }
 
     try {
