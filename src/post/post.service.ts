@@ -9,7 +9,7 @@ import { Post } from 'src/post/post.entity';
 import { UrlGeneratorService } from 'src/utils/pagination.util';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
-import { PaginatedPostsResponse, PostResponse } from 'src/types/post';
+import { PaginatedPostsResponse, PostResponse } from './dto/post';
 import paginationConfig from 'src/utils/pagination.config';
 import { Role } from 'src/types/role.enum';
 import { InjectRepository } from '@nestjs/typeorm';

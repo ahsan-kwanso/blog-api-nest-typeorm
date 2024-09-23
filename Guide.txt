@@ -221,20 +221,24 @@ see all the work of async await see github repo of someone and then proceed --- 
 After this remove modules to outside  --- done
 update feature should return just messages --- done
 make some thing for env config like what and how --- done
-then head to chat and see what was Suggested
-then move auth to user module
-see what was asked for files and remove that Pipe as well
+then head to chat and see what was Suggested --- done
+then move auth to user module ---- done
+see what was asked for files and remove that Pipe as well --- done, we have to add pipes manually as well
 then after working on all recommendations change the schema for db like separate table for roles now
 and write the subscribers then for those validate and encrypting the password
 move entities to modules then ---- done
+use some package for status codes ---- done
 move types to dtos in modules
 see about rxjs as well  ---- done
 don't use whole request get id just like thing see in commented code
 that thing of instance creation as well when repository is injected
 modify that edit and delete response as   ---- done
-modify frontend to send only the token
-how to enforce that .service .controller file extension
+modify frontend to send only the token --- will be using the link to verify
+how to enforce that .service .controller file extension ---- done, you can use es-lint to enforce such behaviours
 make separate modules for email and file upload ----file module separated now separat send mail module ---- done
+update your dto of pagination acc to feedback
+that file size handling in controller don't use that in service
+see for that whitelist arg when get time
 */
 
 

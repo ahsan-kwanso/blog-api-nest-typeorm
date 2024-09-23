@@ -9,7 +9,7 @@ import { Comment } from './comment.entity';
 import { Post } from 'src/post/post.entity';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';
-import { CommentData, CommentsResult } from 'src/types/comment';
+import { CommentData, CommentsResult } from 'src/comment/dto/comment';
 
 @Injectable()
 export class CommentService {

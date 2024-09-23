@@ -12,7 +12,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import {
   PaginatedUserWithNumberOfPosts,
   UserWithNumberOfPosts,
-} from 'src/types/user';
+} from 'src/user/dto/user';
 import paginationConfig from 'src/utils/pagination.config';
 import { Request as ExpressRequest } from 'express';
 import { UrlGeneratorService } from 'src/utils/pagination.util';

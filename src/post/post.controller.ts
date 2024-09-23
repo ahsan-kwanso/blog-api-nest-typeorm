@@ -17,7 +17,7 @@ import { PostService } from './post.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { Post as PostModel } from 'src/post/post.entity';
-import { PaginatedPostsResponse } from 'src/types/post';
+import { PaginatedPostsResponse } from './dto/post';
 import { JwtConditionalAuthGuard } from '../user/auth/jwt.auth.guard';
 
 @Controller('posts')

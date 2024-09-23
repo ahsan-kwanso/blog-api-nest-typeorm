@@ -12,6 +12,6 @@ export class PaginationQueryDto {
   @IsOptional()
   @IsInt({ message: 'Limit must be an integer' })
   @Min(1, { message: 'Limit must be at least 1' })
-  @Transform(({ value }) => parseInt(value, 10)) // Transform string to number, it should be above int check, isnumberstring decorator, write i sequence, also add max limit decorator
+  @Transform(({ value }) => parseInt(value, 10)) // Transform string to number, it should be above int check, isnumberstring decorator, write in sequence, also add max limit decorator
   limit: number = paginationConfig.defaultLimit;
 }

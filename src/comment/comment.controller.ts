@@ -14,7 +14,7 @@ import { CreateCommentDto } from './dto/create-comment.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';
 import { Comment } from 'src/comment/comment.entity';
 import { Request } from 'express';
-import { CommentsResult } from 'src/types/comment';
+import { CommentsResult } from 'src/comment/dto/comment';
 
 @Controller('comments')
 export class CommentController {
