@@ -11,7 +11,7 @@ import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { PaginatedPostsResponse, PostResponse } from './dto/post';
 import paginationConfig from 'src/utils/pagination.config';
-import { Role } from 'src/types/role.enum';
+import { Role } from 'src/user/dto/role.enum';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, SelectQueryBuilder } from 'typeorm';
 

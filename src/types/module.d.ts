@@ -1,4 +1,4 @@
-import { TokenPayload } from './tokenPayload.interface';
+import { TokenPayload } from '../user/auth/dto/tokenPayload.interface';
 
 declare global {
   namespace Express {

@@ -5,7 +5,7 @@ import {
   IsString,
   MinLength,
 } from 'class-validator';
-import { Role } from 'src/types/role.enum';
+import { Role } from 'src/user/dto/role.enum';
 
 export class UpdateUserDto {
   @IsString()
