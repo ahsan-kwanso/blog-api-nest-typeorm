@@ -12,7 +12,7 @@ import {
 import { CommentService } from './comment.service';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';
-import { Comment } from 'src/database/entities/comment.entity';
+import { Comment } from 'src/comment/comment.entity';
 import { Request } from 'express';
 import { CommentsResult } from 'src/types/comment';
 

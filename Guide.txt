@@ -234,7 +234,8 @@ that thing of instance creation as well when repository is injected
 modify that edit and delete response as   ---- done
 modify frontend to send only the token
 how to enforce that .service .controller file extension
-make separate modules for email and file upload ----file module separated now separat send mail module
+make separate modules for email and file upload ----file module separated now separat send mail module ---- done
+move types to dtos
 */
 
 

@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { User } from 'src/database/entities/user.entity'; // Updated import path
+import { User } from 'src/user/user.entity'; // Updated import path
 import { SignupDto } from './dto/signup.dto';
 import { LoginDto } from './dto/login.dto';
 import { generateToken } from 'src/utils/jwt.util';

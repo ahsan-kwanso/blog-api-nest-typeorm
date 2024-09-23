@@ -7,8 +7,8 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { User } from './user.entity';
-import { Post } from './post.entity';
+import { User } from '../user/user.entity';
+import { Post } from '../post/post.entity';
 
 @Entity({ name: 'Comments' }) // You can specify table name if needed
 export class Comment {

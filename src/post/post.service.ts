@@ -5,7 +5,7 @@ import {
   ForbiddenException,
 } from '@nestjs/common';
 import { Request as ExpressRequest } from 'express';
-import { Post } from 'src/database/entities/post.entity';
+import { Post } from 'src/post/post.entity';
 import { UrlGeneratorService } from 'src/utils/pagination.util';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';

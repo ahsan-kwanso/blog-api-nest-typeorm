@@ -16,7 +16,7 @@ import { PaginationQueryDto } from '../common/pagination.dto';
 import { PostService } from './post.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
-import { Post as PostModel } from 'src/database/entities/post.entity';
+import { Post as PostModel } from 'src/post/post.entity';
 import { PaginatedPostsResponse } from 'src/types/post';
 import { JwtConditionalAuthGuard } from '../auth/jwt.auth.guard';
 

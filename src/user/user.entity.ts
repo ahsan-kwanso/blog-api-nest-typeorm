@@ -9,8 +9,8 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import * as bcrypt from 'bcrypt';
-import { Post } from './post.entity';
-import { Comment } from './comment.entity';
+import { Post } from '../post/post.entity';
+import { Comment } from '../comment/comment.entity';
 
 enum Role {
   USER = 'user',

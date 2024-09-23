@@ -8,8 +8,8 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { User } from './user.entity';
-import { Comment } from './comment.entity';
+import { User } from '../user/user.entity';
+import { Comment } from '../comment/comment.entity';
 
 @Entity({ name: 'Posts' }) // Specify table name if needed
 export class Post {
