@@ -18,7 +18,7 @@ import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { Post as PostModel } from 'src/post/post.entity';
 import { PaginatedPostsResponse } from './dto/post';
-import { JwtConditionalAuthGuard } from '../user/auth/jwt.auth.guard';
+import { JwtConditionalAuthGuard } from '../common/jwt.auth.guard';
 import { LoggedInUserId } from 'src/common/LoggedInUserId.decorator';
 import { LoggedInUserRole } from 'src/common/LoggedInUserRole.decorator';
 import { Role } from 'src/user/dto/role.enum';
@@ -36,7 +36,6 @@ export class PostController {
     return await this.postService.create(createPostDto, userId);
   }
 
-  @UseGuards(JwtConditionalAuthGuard) // as I have removed middlware authentication so this will check if filter is passed because in that case authentication is required
   @Get()
   async getPosts(
     @Query() paginationQuery: PaginationQueryDto,
@@ -44,20 +43,12 @@ export class PostController {
     @Query('userId') userId: string,
     @Req() req: ExpressRequest, // Add the request object
   ): Promise<PaginatedPostsResponse> {
-    if (filter === 'my-posts' && userId) {
-      return await this.postService.getMyPosts(
-        parseInt(userId),
-        paginationQuery.page,
-        paginationQuery.limit,
-        req,
-      );
-    } else {
-      return await this.postService.getPosts(
-        paginationQuery.page,
-        paginationQuery.limit,
-        req,
-      );
-    }
+    return await this.postService.getPosts(
+      filter,
+      userId,
+      paginationQuery,
+      req,
+    );
   }
 
   @UseGuards(JwtConditionalAuthGuard)

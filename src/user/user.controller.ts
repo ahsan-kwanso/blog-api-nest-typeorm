@@ -20,9 +20,9 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PaginationQueryDto } from '../common/pagination.dto';
 import { Request as ExpressRequest } from 'express';
-import { Roles } from './auth/roles.decorator';
+import { Roles } from '../common/roles.decorator';
 import { Role } from 'src/user/dto/role.enum';
-import { RolesGuard } from './auth/roles.guard';
+import { RolesGuard } from '../common/roles.guard';
 import { LoggedInUserId } from 'src/common/LoggedInUserId.decorator';
 
 const MAX_FILE_SIZE_MB = 10;

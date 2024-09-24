@@ -11,9 +11,10 @@ import { UserModule } from './user/user.module';
 import { PostModule } from './post/post.module';
 import { CommentModule } from './comment/comment.module';
 import { AuthModule } from './user/auth/auth.module';
-import { AuthMiddleware } from './user/auth/auth.middleware';
-import { RolesGuard } from './user/auth/roles.guard';
+import { AuthMiddleware } from './common/auth.middleware';
+import { RolesGuard } from './common/roles.guard';
 import { ConfigModule } from '@nestjs/config';
+import { ConditionalPostAuthMiddleware } from './common/cond.auth.middleware';
 
 @Module({
   imports: [
@@ -42,5 +43,9 @@ export class AppModule implements NestModule {
       .exclude({ path: 'auth', method: RequestMethod.POST }, 'auth/(.*)') // Exclude auth routes from middleware
       .exclude({ path: 'posts', method: RequestMethod.GET }, 'posts/search') // The authentication is added through guard and we have removed authentication from get methods, but using guard will apply authentication based on the filter query param
       .forRoutes('*'); // Apply to all routes
+
+    consumer
+      .apply(ConditionalPostAuthMiddleware) // Specific middleware for GET /posts
+      .forRoutes({ path: 'posts', method: RequestMethod.GET });
   }
 }

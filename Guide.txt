@@ -241,11 +241,11 @@ that file size handling in controller don't use that in service ---- done
 see for that whitelist arg when get time --- as I have not defined dtos for some so I have set it to false currently
 
 uuid and simple id  ---- done
-adjust that guard
+adjust that guard on user admin thing
 modify that axios interceptor as suggested in feedback session ---- done
 remove that date formatting in backend ---- done
-separate classes, cat, uat
-Reflect Metadata, see about this i think related to guard it is
+separate classes, cat, uat  ---- done
+Reflect Metadata, see about this i think related to guard and decoratos it is --- done
 restructure guards, don't use filter in guards but in service
 nest js application lifecycle 
 ctx usage

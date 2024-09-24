@@ -14,6 +14,7 @@ import paginationConfig from 'src/utils/pagination.config';
 import { Role } from 'src/user/dto/role.enum';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, SelectQueryBuilder } from 'typeorm';
+import { PaginationQueryDto } from 'src/common/pagination.dto';
 
 @Injectable()
 export class PostService {
@@ -43,27 +44,45 @@ export class PostService {
   }
 
   async getPosts(
-    page: number = paginationConfig.defaultPage,
-    limit: number = paginationConfig.defaultLimit,
+    filter: string,
+    userId: string,
+    paginationQuery: PaginationQueryDto,
     req: ExpressRequest,
-  ): Promise<PaginatedPostsResponse> {
-    // Call common logic with no specific user filtering
-    return await this.fetchPosts(null, page, limit, req);
+  ) {
+    // If 'filter' is 'my-posts', ensure the user is authenticated and matches userId
+    if (filter === 'my-posts') {
+      if (!req.user) {
+        throw new ForbiddenException('Authentication is required');
+      }
+
+      // Ensure the authenticated user matches the userId in the query
+      if (parseInt(userId) !== req.user.id) {
+        throw new ForbiddenException('You do not have permissions');
+      }
+
+      // Fetch posts specific to the user
+      return await this.getMyPosts(req.user.id, paginationQuery, req);
+    }
+
+    // For non-'my-posts', fetch public posts
+    return await this.getPublicPosts(paginationQuery, req);
   }
 
   async getMyPosts(
     userId: number,
-    page: number = paginationConfig.defaultPage,
-    limit: number = paginationConfig.defaultLimit,
+    paginationQuery: PaginationQueryDto,
     req: ExpressRequest,
   ): Promise<PaginatedPostsResponse> {
-    // Ensure the authenticated user can access their posts
-    if (userId !== req.user.id) {
-      throw new ForbiddenException('You do not have permissions');
-    }
+    // Fetch and return posts by userId
+    return await this.fetchPosts(userId, paginationQuery, req);
+  }
 
-    // Call common logic with user filtering
-    return await this.fetchPosts(userId, page, limit, req);
+  async getPublicPosts(
+    paginationQuery: PaginationQueryDto,
+    req: ExpressRequest,
+  ): Promise<PaginatedPostsResponse> {
+    // Fetch and return public posts
+    return await this.fetchPosts(null, paginationQuery, req);
   }
 
   /**
@@ -72,20 +91,18 @@ export class PostService {
    */
   private async fetchPosts(
     userId: number | null,
-    page: number,
-    limit: number,
+    paginationQuery: PaginationQueryDto,
     req: ExpressRequest,
   ): Promise<PaginatedPostsResponse> {
-    const pageSize = Number(limit);
-    const pageNumber = Number(page);
-
+    const pageSize = paginationQuery.limit;
+    const pageNumber = paginationQuery.page;
     // Define a base query, use query builder less
     const query = this.postRepository
       .createQueryBuilder('post')
       .leftJoinAndSelect('post.user', 'user') // Eager load the user relation
       .orderBy('post.createdAt', 'DESC')
-      .take(pageSize)
-      .skip((pageNumber - 1) * pageSize);
+      .limit(pageSize)
+      .offset((pageNumber - 1) * pageSize);
 
     // Add user filtering if applicable
     if (userId) {
@@ -94,7 +111,6 @@ export class PostService {
 
     // Execute the query and get paginated posts
     const [posts, total] = await query.getManyAndCount();
-
     // Map posts to the required format
     const formattedPosts: PostResponse[] = posts.map((post) => ({
       id: post.id,
