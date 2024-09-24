@@ -171,24 +171,24 @@ keep async await managed
 
 
 /*
-/ package.json explore
-// dependency injection
-// lifecycle 
+/ package.json explore ---- done
+// dependency injection ---- done
+// lifecycle  ---- done
 // .service usage ---- done
-// ctx wokring and usage
+// ctx wokring and usage ---- done
 // status codes  ---- done
 // pipe : messages, validations, global valiator ---- done
-// restructure guards, don't use filter in guards but in service
-// token verificaiton in guards
-// Reflect Metadata
-// don't use separate queries, create a single
+// restructure guards, don't use filter in guards but in service ----- done
+// token verificaiton in guards ---- yes removed that ---- done
+// Reflect Metadata ---- done
+// don't use separate queries, create a single ---- done
 // Transform before IsInt, sequence checking, also tell the max limit  --- done
 // create separate folder for common       ---- done
 // check for await keyword  ---- done
 // file format validation using custom inteceptor ---- done
 // decorator for param validation ---- done
 // AWS v3 usage instead of v2   ---- done
-// separate classes, cat, uat
+// separate classes, cat, uat ---- done
 // validation in entities, ---- done
 // write the subscriber  ---- done
 // usage of join column, only use when column name is different,it is must in one-to-one relationship. ---- done
@@ -197,8 +197,8 @@ keep async await managed
 // define default port instead of using !, ---- done
 // app.module validation for configuration, everything should come from same configuration. ---- done
 // create provider if you want to use async, or use useclass and providers should be separate ---- done
-// use query builder as minimal as possible
-// don't format date in backend
+// use query builder as minimal as possible ---- done
+// don't format date in backend  ---- done
 // don't fetch user relation on updating the post ---- done
 // make the common ENUM, create a separate table for roles ---- done
 // modules should not be under separate folder  ---- done
@@ -241,14 +241,14 @@ that file size handling in controller don't use that in service ---- done
 see for that whitelist arg when get time --- as I have not defined dtos for some so I have set it to false currently
 
 uuid and simple id  ---- done
-adjust that guard on user admin thing
+adjust that guard on user admin thing ---- done
 modify that axios interceptor as suggested in feedback session ---- done
 remove that date formatting in backend ---- done
 separate classes, cat, uat  ---- done
 Reflect Metadata, see about this i think related to guard and decoratos it is --- done
-restructure guards, don't use filter in guards but in service
-nest js application lifecycle 
-ctx usage
+restructure guards, don't use filter in guards but in service ---- done
+nest js application lifecycle  --- done
+ctx usage ---- current execution context ----- done
 */
 
 
