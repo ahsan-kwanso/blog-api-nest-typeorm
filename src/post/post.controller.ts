@@ -60,22 +60,14 @@ export class PostController {
     @Query('userId') userId: string,
     @Req() req: ExpressRequest,
   ): Promise<PaginatedPostsResponse> {
-    if (filter === 'my-posts' && userId) {
-      return await this.postService.searchPosts(
-        title,
-        paginationQuery.page,
-        paginationQuery.limit,
-        req,
-        parseInt(userId),
-      );
-    } else {
-      return await this.postService.searchPosts(
-        title,
-        paginationQuery.page,
-        paginationQuery.limit,
-        req,
-      );
-    }
+    return await this.postService.searchPosts(
+      title,
+      paginationQuery.page,
+      paginationQuery.limit,
+      req,
+      filter, // Pass the filter to the service
+      userId ? parseInt(userId) : undefined, // Pass userId only if it's present
+    );
   }
 
   // Get a single post by ID

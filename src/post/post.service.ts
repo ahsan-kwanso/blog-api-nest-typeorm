@@ -85,10 +85,6 @@ export class PostService {
     return await this.fetchPosts(null, paginationQuery, req);
   }
 
-  /**
-   * Fetches posts with optional user filtering.
-   * This method contains the common pagination, sorting, and formatting logic.
-   */
   private async fetchPosts(
     userId: number | null,
     paginationQuery: PaginationQueryDto,
@@ -142,27 +138,35 @@ export class PostService {
     page: number = paginationConfig.defaultPage,
     limit: number = paginationConfig.defaultLimit,
     req: ExpressRequest,
+    filter?: string, // Filter to differentiate between all posts and my-posts
     userId?: number, // Optional userId for filtering user-specific posts
   ): Promise<PaginatedPostsResponse> {
     const pageSize = Number(limit);
     const pageNumber = Number(page);
 
-    // Check if filtering by user is needed
-    if (userId && userId !== req.user.id) {
-      throw new ForbiddenException('You do not have permissions');
-    }
-
-    // Build the query to fetch posts with pagination, filtering, and sorting
+    // Initialize query builder to search posts by title
     const queryBuilder: SelectQueryBuilder<Post> = this.postRepository
       .createQueryBuilder('post')
       .leftJoinAndSelect('post.user', 'user') // Eager load the user relation
       .where('post.title ILIKE :title', { title: `%${title}%` }); // Case-insensitive search for title
 
-    // If userId is provided, filter posts by the current user's ID
-    if (userId) {
-      queryBuilder.andWhere('post.UserId = :userId', { userId });
+    // Handle the 'my-posts' filter by checking authentication and userId
+    if (filter === 'my-posts') {
+      // Ensure the user is authenticated
+      if (!req.user) {
+        throw new ForbiddenException('Authentication is required');
+      }
+
+      // Check if the authenticated user's ID matches the userId in the query
+      if (userId && userId !== req.user.id) {
+        throw new ForbiddenException('You do not have permissions');
+      }
+
+      // Filter posts by the current user's ID
+      queryBuilder.andWhere('post.UserId = :userId', { userId: req.user.id });
     }
 
+    // Apply pagination and sorting
     queryBuilder
       .take(pageSize)
       .skip((pageNumber - 1) * pageSize)
