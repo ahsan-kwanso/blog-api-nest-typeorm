@@ -101,7 +101,7 @@ export class PostService {
       author: post.user?.name, // Access the user's name
       title: post.title,
       content: post.content,
-      date: post.updatedAt?.toISOString().split('T')[0], // Format date as YYYY-MM-DD, just format on frontend
+      date: post.updatedAt, // Format date as YYYY-MM-DD, just format on frontend
     }));
 
     // Calculate pagination details
@@ -161,7 +161,7 @@ export class PostService {
       author: post.user?.name || 'Unknown', // Access the user's name
       title: post.title,
       content: post.content,
-      date: post.updatedAt?.toISOString().split('T')[0], // Format date as YYYY-MM-DD
+      date: post.updatedAt, // Format date as YYYY-MM-DD
     }));
 
     // Calculate pagination details

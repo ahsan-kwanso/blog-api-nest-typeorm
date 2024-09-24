@@ -173,11 +173,11 @@ keep async await managed
 /*
 / package.json explore
 // dependency injection
-// lifecycle
-// .service usage
+// lifecycle 
+// .service usage ---- done
 // ctx wokring and usage
-// status codes
-// pipe : messages, validations, global valiator
+// status codes  ---- done
+// pipe : messages, validations, global valiator ---- done
 // restructure guards, don't use filter in guards but in service
 // token verificaiton in guards
 // Reflect Metadata
@@ -200,7 +200,7 @@ keep async await managed
 // use query builder as minimal as possible
 // don't format date in backend
 // don't fetch user relation on updating the post ---- done
-// make the common ENUM, create a separate table for roles
+// make the common ENUM, create a separate table for roles ---- done
 // modules should not be under separate folder  ---- done
 // migration commands  ----- done
 // decorators explanation, use custom decorator ---- done
@@ -224,7 +224,7 @@ make some thing for env config like what and how --- done
 then head to chat and see what was Suggested --- done
 then move auth to user module ---- done
 see what was asked for files and remove that Pipe as well --- done, we have to add pipes manually as well
-then after working on all recommendations change the schema for db like separate table for roles now
+then after working on all recommendations change the schema for db like separate table for roles now ---- done
 and write the subscribers then for those validate and encrypting the password ---- done
 move entities to modules then ---- done
 use some package for status codes ---- done
@@ -239,8 +239,16 @@ make separate modules for email and file upload ----file module separated now se
 update your dto of pagination acc to feedback --- done
 that file size handling in controller don't use that in service ---- done
 see for that whitelist arg when get time --- as I have not defined dtos for some so I have set it to false currently
-uuid and simple id
+
+uuid and simple id  ---- done
 adjust that guard
+modify that axios interceptor as suggested in feedback session ---- done
+remove that date formatting in backend
+separate classes, cat, uat
+Reflect Metadata, see about this i think related to guard it is
+restructure guards, don't use filter in guards but in service
+nest js application lifecycle 
+ctx usage
 */
 
 
@@ -248,8 +256,6 @@ adjust that guard
 
 
 /*
-separate table for OTP and create one-many. ----------------------------------
-consider otp used at, verified at  -------------------------------------------
 store token in redis this is one technique as well ---------------------------
 instead of isverified use verifiedat -----------------------------------------
 session based authentication as well -----------------------------------------
@@ -261,14 +267,14 @@ will implementation verification link technique, i think that will be better ---
 */
 
 
-now upto subscribers thing and then will see separate role table then will see the link verification then will see UI update like handle that sidebar thing.
+now upto subscribers thing and then will see separate role table then will see the link verification then will see UI update like handle that sidebar thing.   --- done
 
 Will add the role table and that link verification later but currently make some thing out of that UI.
-Like sidebar thing, now I will be adding sidebar in layout, but instead of main page on all other pages just show home icon, instead of tabs of All Posts and My Posts, then later will see for optimization in design
+Like sidebar thing, now I will be adding sidebar in layout, but instead of main page on all other pages just show home icon, instead of tabs of All Posts and My Posts, then later will see for optimization in design ---- done
 
 
 Back to backend 
-What is the remaining work, separate the user role table, but i think first should implement the link based verification, when this is completed then will see the UI and at the end start with that db schema update
+What is the remaining work, separate the user role table, but i think first should implement the link based verification, when this is completed then will see the UI and at the end start with that db schema update  ---- done
 
 Ok link verification completed and UI as well, so tomorrow will see for schema updates
 add expiration time, to jwt token, study about session based authentication

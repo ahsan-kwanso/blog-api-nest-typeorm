@@ -24,7 +24,7 @@ interface PostResponse {
   author?: string; // Represents the user's name
   title: string;
   content: string;
-  date: string; // Formatted date as YYYY-MM-DD
+  date: Date; // Formatted date as YYYY-MM-DD
 }
 
 // Error Response
