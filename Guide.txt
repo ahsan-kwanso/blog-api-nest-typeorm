@@ -182,28 +182,28 @@ keep async await managed
 // token verificaiton in guards
 // Reflect Metadata
 // don't use separate queries, create a single
-// Transform before IsInt, sequence checking, also tell the max limit
-// create separate folder for common
-// check for await keyword
-// file format validation using custom inteceptor
-// decorator for param validation
-// AWS v3 usage instead of v2
+// Transform before IsInt, sequence checking, also tell the max limit  --- done
+// create separate folder for common       ---- done
+// check for await keyword  ---- done
+// file format validation using custom inteceptor ---- done
+// decorator for param validation ---- done
+// AWS v3 usage instead of v2   ---- done
 // separate classes, cat, uat
-// validation in entities,
-// write the subscriber
-// usage of join column, only use when column name is different,it is must in one-to-one relationship.
-// define Cascade relationship
-// do not use name of column with @Column, not recommended
-// define default port instead of using !,
-// app.module validation for configuration, everything should come from same configuration.
-// create provider if you want to use async, or use useclass and providers should be separate
+// validation in entities, ---- done
+// write the subscriber  ---- done
+// usage of join column, only use when column name is different,it is must in one-to-one relationship. ---- done
+// define Cascade relationship ---- already done
+// do not use name of column with @Column, not recommended  ---- done
+// define default port instead of using !, ---- done
+// app.module validation for configuration, everything should come from same configuration. ---- done
+// create provider if you want to use async, or use useclass and providers should be separate ---- done
 // use query builder as minimal as possible
 // don't format date in backend
-// don't fetch user relation on updating the post
+// don't fetch user relation on updating the post ---- done
 // make the common ENUM, create a separate table for roles
-// modules should not be under separate folder
-// migration commands
-// decorators explanation, use custom decorator
+// modules should not be under separate folder  ---- done
+// migration commands  ----- done
+// decorators explanation, use custom decorator ---- done
 
 
 
@@ -225,7 +225,7 @@ then head to chat and see what was Suggested --- done
 then move auth to user module ---- done
 see what was asked for files and remove that Pipe as well --- done, we have to add pipes manually as well
 then after working on all recommendations change the schema for db like separate table for roles now
-and write the subscribers then for those validate and encrypting the password
+and write the subscribers then for those validate and encrypting the password ---- done
 move entities to modules then ---- done
 use some package for status codes ---- done
 move types to dtos in modules ---- done
@@ -233,12 +233,14 @@ see about rxjs as well  ---- done
 don't use whole request get id just like thing see in commented code ---- done
 that thing of instance creation as well when repository is injected ---- done
 modify that edit and delete response as   ---- done
-modify frontend to send only the token --- will be using the link to verify
+modify frontend to send only the token --- will be using the link to verify ---- done
 how to enforce that .service .controller file extension ---- done, you can use es-lint to enforce such behaviours
 make separate modules for email and file upload ----file module separated now separat send mail module ---- done
 update your dto of pagination acc to feedback --- done
 that file size handling in controller don't use that in service ---- done
 see for that whitelist arg when get time --- as I have not defined dtos for some so I have set it to false currently
+uuid and simple id
+adjust that guard
 */
 
 
@@ -246,11 +248,6 @@ see for that whitelist arg when get time --- as I have not defined dtos for some
 
 
 /*
-loader on image
-container app, posts page, check for  commetns only call
-verify through link.
-and don't generate token before verification
-don't return null in verifyOtp, in signin case you don't need isverified
 separate table for OTP and create one-many. ----------------------------------
 consider otp used at, verified at  -------------------------------------------
 store token in redis this is one technique as well ---------------------------
@@ -259,10 +256,8 @@ session based authentication as well -----------------------------------------
 timer stored in local storage
 
 
-sign up verificaiton email --> token gen from backend and that in url, and then send the link, then user should login, get from query param.
-will implementation verification link technique, i think that will be better
-Which type of interactivity needed so that we need CSR
-middleware application otherways
+sign up verificaiton email --> token gen from backend and that in url, and then send the link, then user should login, get from query param. --- done
+will implementation verification link technique, i think that will be better --- done
 */
 
 
@@ -274,3 +269,6 @@ Like sidebar thing, now I will be adding sidebar in layout, but instead of main 
 
 Back to backend 
 What is the remaining work, separate the user role table, but i think first should implement the link based verification, when this is completed then will see the UI and at the end start with that db schema update
+
+Ok link verification completed and UI as well, so tomorrow will see for schema updates
+add expiration time, to jwt token, study about session based authentication

@@ -6,6 +6,7 @@ import {
   InternalServerErrorException,
 } from '@nestjs/common';
 import { User } from 'src/user/user.entity';
+import { Role } from './role.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -24,6 +25,8 @@ export class UserService {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    @InjectRepository(Role)
+    private readonly roleRepository: Repository<Role>,
     private readonly urlGeneratorService: UrlGeneratorService,
     private readonly fileUploadService: FileUploadService,
   ) {}
@@ -39,14 +42,35 @@ export class UserService {
       throw new ConflictException('A user with this email already exists');
     }
 
-    // Create a new user instance
-    const user = this.userRepository.create(createUserDto);
+    const { roleId } = createUserDto;
+
+    let role: Role | null;
+
+    // Check if roleId is provided
+    if (roleId) {
+      role = await this.roleRepository.findOne({ where: { id: roleId } });
+      if (!role) {
+        throw new NotFoundException('Role not found');
+      }
+    } else {
+      // If no role specified, assign 'user' role by default
+      role = await this.roleRepository.findOne({ where: { name: 'user' } });
+      if (!role) {
+        throw new NotFoundException('Default user role not found');
+      }
+    }
+
+    const user = this.userRepository.create({
+      ...createUserDto,
+      role,
+    });
 
     // Save the new user to the database
     await this.userRepository.save(user);
 
     const reloadedUser = await this.userRepository.findOne({
       where: { id: user.id },
+      relations: ['role'],
     });
 
     if (!reloadedUser) {
@@ -102,18 +126,21 @@ export class UserService {
     const queryBuilder = this.userRepository
       .createQueryBuilder('user')
       .leftJoinAndSelect('user.posts', 'post') // Join with posts to count them
+      .leftJoin('user.role', 'role') // Join with role to access role properties
       .select([
-        'user.id',
-        'user.name',
-        'user.email',
-        'user.role',
+        'user.id AS user_id',
+        'user.name AS user_name',
+        'user.email AS user_email',
+        'role.name AS user_role', // Accessing role name correctly
         'COUNT(post.id) AS postscount', // Count posts and alias as postscount
       ])
       .groupBy('user.id') // Group by user ID
-      .offset((pageNumber - 1) * pageSize) // Offset for pagination skip was not working here so used offset
-      .limit(pageSize); // Limit the results // .take was creating issues here so changed to .limit
+      .addGroupBy('role.name') // Group by role name
+      .offset((pageNumber - 1) * pageSize) // Offset for pagination
+      .limit(pageSize); // Limit the results
+
     if (role) {
-      queryBuilder.andWhere('user.role = :role', { role });
+      queryBuilder.andWhere('role.name = :role', { role }); // Corrected to access role name
     }
 
     if (Object.keys(order).length) {
@@ -126,8 +153,9 @@ export class UserService {
       this.userRepository
         .createQueryBuilder('user')
         .leftJoin('user.posts', 'post')
+        .leftJoin('user.role', 'role') // Join with role for total count query
         .select('COUNT(user.id)', 'count')
-        .where(role ? 'user.role = :role' : '1=1', { role })
+        .where(role ? 'role.name = :role' : '1=1', { role })
         .getRawOne(), // Get total count
     ]);
 

@@ -5,14 +5,12 @@ import {
   OneToMany,
   CreateDateColumn,
   UpdateDateColumn,
+  ManyToOne,
+  JoinColumn,
 } from 'typeorm';
 import { Post } from '../post/post.entity';
 import { Comment } from '../comment/comment.entity';
-
-enum Role {
-  USER = 'user',
-  ADMIN = 'admin',
-}
+import { Role } from './role.entity';
 
 // separate table for role
 
@@ -30,11 +28,12 @@ export class User {
   @Column({ type: 'varchar', length: 100, nullable: false, select: false }) // Exclude password by default
   password: string;
 
-  @Column({
-    type: 'enum',
-    enum: Role,
-    default: Role.USER, // Default role is user
-  })
+  @Column({ type: 'int', nullable: false, default: 1 })
+  RoleId: number;
+
+  // add a foreign key reference to the Role table
+  @ManyToOne(() => Role, { eager: true })
+  @JoinColumn({ name: 'RoleId' }) // Links to role table
   role: Role;
 
   @OneToMany(() => Post, (post) => post.user)

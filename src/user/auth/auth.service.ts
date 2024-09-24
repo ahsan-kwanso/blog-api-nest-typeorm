@@ -14,6 +14,7 @@ import { generateToken } from 'src/utils/jwt.util';
 import * as sgMail from '@sendgrid/mail';
 import { EmailService } from 'src/thirdParty/sg/email.service';
 import { PasswordHelper } from './password.helper';
+import { Role as RoleEnum } from '../dto/role.enum'; // Import Role enum
 dotenv.config();
 
 @Injectable()
@@ -39,7 +40,8 @@ export class AuthService {
     const user = this.userRepository.create({
       ...signupDto,
       isVerified: false, // User is not verified yet
-      verificationToken: verificationToken, // Store the verification code
+      verificationToken, // Store the verification code
+      //RoleId: 1, // by default user
     });
     // Send the verification code to the user's email
     const verificationLink = `${process.env.APP_URL}/verify-email?token=${verificationToken}`;
@@ -86,6 +88,7 @@ export class AuthService {
         'isVerified',
         'verificationToken',
       ], // Manually select password
+      relations: ['role'],
     });
 
     if (
@@ -99,7 +102,7 @@ export class AuthService {
     }
 
     if (user && !user.isVerified) {
-      const verificationToken: string = user.verificationToken;
+      const verificationToken = user.verificationToken;
       const verificationLink = `${process.env.APP_URL}/verify-email?token=${verificationToken}`;
       await this.emailService.sendVerificationEmail(
         user.email,
@@ -110,12 +113,12 @@ export class AuthService {
         'Email not verified. A verification link has been sent to your email.',
       );
     }
-
+    const role: RoleEnum = user.role.name as RoleEnum; // Cast as Role enum
     return generateToken({
       id: user.id,
       name: user.name,
       email: user.email,
-      role: user.role,
+      role: role,
     });
   }
 }

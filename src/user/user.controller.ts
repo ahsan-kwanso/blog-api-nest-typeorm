@@ -23,7 +23,6 @@ import { Request as ExpressRequest } from 'express';
 import { Roles } from './auth/roles.decorator';
 import { Role } from 'src/user/dto/role.enum';
 import { RolesGuard } from './auth/roles.guard';
-import { diskStorage } from 'multer';
 import { LoggedInUserId } from 'src/common/LoggedInUserId.decorator';
 
 const MAX_FILE_SIZE_MB = 10;
