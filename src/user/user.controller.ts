@@ -52,7 +52,6 @@ const limits = {
 };
 
 @Controller('users')
-@UseGuards(RolesGuard)
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
@@ -62,12 +61,14 @@ export class UserController {
   }
 
   @Get('/v1')
+  @UseGuards(RolesGuard)
   @Roles(Role.ADMIN)
   async findAll() {
     return await this.userService.findAll();
   }
 
   @Get()
+  @UseGuards(RolesGuard)
   @Roles(Role.ADMIN)
   async findAllPag(
     @Req() req: ExpressRequest,
@@ -100,6 +101,7 @@ export class UserController {
   }
 
   @Patch(':id')
+  @UseGuards(RolesGuard)
   @Roles(Role.ADMIN) // as for my purpose only admin should edit
   async update(
     @Param('id', ParseIntPipe) id: string,
