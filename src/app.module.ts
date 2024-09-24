@@ -46,6 +46,6 @@ export class AppModule implements NestModule {
 
     consumer
       .apply(ConditionalPostAuthMiddleware) // Specific middleware for GET /posts
-      .forRoutes({ path: 'posts', method: RequestMethod.GET });
+      .forRoutes({ path: 'posts', method: RequestMethod.GET }, 'posts/search');
   }
 }

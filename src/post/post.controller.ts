@@ -18,7 +18,6 @@ import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { Post as PostModel } from 'src/post/post.entity';
 import { PaginatedPostsResponse } from './dto/post';
-import { JwtConditionalAuthGuard } from '../common/jwt.auth.guard';
 import { LoggedInUserId } from 'src/common/LoggedInUserId.decorator';
 import { LoggedInUserRole } from 'src/common/LoggedInUserRole.decorator';
 import { Role } from 'src/user/dto/role.enum';
@@ -51,7 +50,6 @@ export class PostController {
     );
   }
 
-  @UseGuards(JwtConditionalAuthGuard)
   @Get('/search')
   async searchPosts(
     @Query() paginationQuery: PaginationQueryDto,
