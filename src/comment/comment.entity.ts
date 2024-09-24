@@ -1,20 +1,10 @@
-import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
-  ManyToOne,
-  JoinColumn,
-  CreateDateColumn,
-  UpdateDateColumn,
-} from 'typeorm';
+import { Entity, Column, ManyToOne, JoinColumn } from 'typeorm';
 import { User } from '../user/user.entity';
 import { Post } from '../post/post.entity';
+import { BaseEntity } from '../common/base.entity';
 
 @Entity({ name: 'Comments' }) // You can specify table name if needed
-export class Comment {
-  @PrimaryGeneratedColumn()
-  id: number;
-
+export class Comment extends BaseEntity {
   @Column({ type: 'int', nullable: false }) //don't define column name
   UserId: number;
 
@@ -47,10 +37,4 @@ export class Comment {
 
   // Define the relation if comments can have child comments
   childComments: Comment[];
-
-  @CreateDateColumn()
-  createdAt: Date;
-
-  @UpdateDateColumn()
-  updatedAt: Date;
 }

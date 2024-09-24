@@ -11,14 +11,12 @@ import {
 import { Post } from '../post/post.entity';
 import { Comment } from '../comment/comment.entity';
 import { Role } from './role.entity';
+import { BaseEntity } from '../common/base.entity';
 
 // separate table for role
 
 @Entity({ name: 'Users' }) // Specify table name if needed, make common id , cat,uat separate class
-export class User {
-  @PrimaryGeneratedColumn() // see about uuid
-  id: number;
-
+export class User extends BaseEntity {
   @Column({ type: 'varchar', length: 50, nullable: false })
   name: string;
 
@@ -50,10 +48,4 @@ export class User {
 
   @Column({ type: 'varchar', length: 550, nullable: true })
   profilePictureUrl: string; // New column for profile picture URL
-
-  @CreateDateColumn()
-  createdAt: Date;
-
-  @UpdateDateColumn()
-  updatedAt: Date;
 }
