@@ -279,5 +279,6 @@ What is the remaining work, separate the user role table, but i think first shou
 Ok link verification completed and UI as well, so tomorrow will see for schema updates
 add expiration time, to jwt token, study about session based authentication
 
+implemented session based authentication using cookies now, so so far everything is completed
 
 make jwt validation service class based

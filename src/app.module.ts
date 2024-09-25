@@ -15,6 +15,7 @@ import { AuthMiddleware } from './common/auth.middleware';
 import { RolesGuard } from './common/roles.guard';
 import { ConfigModule } from '@nestjs/config';
 import { ConditionalPostAuthMiddleware } from './common/cond.auth.middleware';
+import { JwtModule } from './utils/jwt.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { ConditionalPostAuthMiddleware } from './common/cond.auth.middleware';
     PostModule,
     CommentModule,
     AuthModule,
+    JwtModule,
   ],
   providers: [
     {

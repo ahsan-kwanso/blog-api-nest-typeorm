@@ -5,10 +5,11 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { Request, Response, NextFunction } from 'express';
-import { verifyToken } from 'src/utils/jwt.util';
+import { JwtService } from 'src/utils/jwt.service';
 
 @Injectable()
 export class ConditionalPostAuthMiddleware implements NestMiddleware {
+  constructor(private readonly jwtService: JwtService) {} // Inject JwtService
   use(req: Request, res: Response, next: NextFunction) {
     const { filter } = req.query;
 
@@ -21,7 +22,7 @@ export class ConditionalPostAuthMiddleware implements NestMiddleware {
       }
 
       try {
-        const decoded = verifyToken(token); // Verifies the JWT token and decodes it
+        const decoded = this.jwtService.verifyToken(token); // Verifies the JWT token and decodes it
         req.user = decoded; // Attach user to the request if token is valid
       } catch (error) {
         throw new ForbiddenException('Invalid or expired token');

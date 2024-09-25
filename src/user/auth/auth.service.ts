@@ -11,13 +11,12 @@ import { Repository } from 'typeorm';
 import { User } from 'src/user/user.entity'; // Updated import path
 import { SignupDto } from './dto/signup.dto';
 import { LoginDto } from './dto/login.dto';
-import { generateToken } from 'src/utils/jwt.util';
 import * as sgMail from '@sendgrid/mail';
 import { EmailService } from 'src/thirdParty/sg/email.service';
 import { PasswordHelper } from './password.helper';
 import { Role as RoleEnum } from '../dto/role.enum'; // Import Role enum
 import { Response, Request as ExpressRequest } from 'express';
-import { verifyToken } from 'src/utils/jwt.util';
+import { JwtService } from '../../utils/jwt.service';
 dotenv.config();
 
 @Injectable()
@@ -28,6 +27,7 @@ export class AuthService {
     private readonly emailService: EmailService,
     private readonly passwordHelper: PasswordHelper,
     private readonly configService: ConfigService, // Inject ConfigService
+    private readonly jwtService: JwtService,
   ) {
     // Use ConfigService to get the SendGrid API key
     sgMail.setApiKey(
@@ -121,7 +121,7 @@ export class AuthService {
       );
     }
     const role: RoleEnum = user.role.name as RoleEnum; // Cast as Role enum
-    const token = generateToken({
+    const token = this.jwtService.generateToken({
       id: user.id,
       name: user.name,
       email: user.email,
@@ -145,7 +145,7 @@ export class AuthService {
     }
 
     try {
-      const decoded = verifyToken(token); // Verify the token
+      const decoded = this.jwtService.verifyToken(token); // Verify the token
       return decoded; // Return the decoded token if valid
     } catch (error) {
       throw new UnauthorizedException('Invalid token');
