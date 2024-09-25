@@ -15,7 +15,8 @@ import * as sgMail from '@sendgrid/mail';
 import { EmailService } from 'src/thirdParty/sg/email.service';
 import { PasswordHelper } from './password.helper';
 import { Role as RoleEnum } from '../dto/role.enum'; // Import Role enum
-import { Response } from 'express';
+import { Response, Request as ExpressRequest } from 'express';
+import { verifyToken } from 'src/utils/jwt.util';
 dotenv.config();
 
 @Injectable()
@@ -124,10 +125,25 @@ export class AuthService {
 
     // Set the token as a cookie in the response
     res.cookie('auth_token', token, {
-      //httpOnly: true, // Prevent access to the cookie from client-side JavaScript
+      httpOnly: true, // Prevent access to the cookie from client-side JavaScript
       secure: false, // Set to true in production (HTTPS)
       maxAge: 3600000, // 1 hour
-      //sameSite: 'strict', // Protect against CSRF attacks
+      sameSite: 'strict', // Protect against CSRF attacks
     });
+  }
+
+  validateToken(req: ExpressRequest) {
+    const token = req.cookies['auth_token']; // Get the token from the cookie
+
+    if (!token) {
+      throw new UnauthorizedException('No token provided');
+    }
+
+    try {
+      const decoded = verifyToken(token); // Verify the token
+      return decoded; // Return the decoded token if valid
+    } catch (error) {
+      throw new UnauthorizedException('Invalid token');
+    }
   }
 }

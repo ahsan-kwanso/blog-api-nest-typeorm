@@ -12,6 +12,6 @@ export const LoggedInUserRole = createParamDecorator(
     if (!user || !user.role) {
       throw new UnauthorizedException('User not authenticated');
     }
-    return user.role.name; // as now different table
+    return user.role; // as now different table
   },
 );

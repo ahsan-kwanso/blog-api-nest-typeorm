@@ -1,8 +1,8 @@
-import { Body, Controller, Post, Res } from '@nestjs/common';
+import { Body, Controller, Post, Res, Get, Req } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { SignupDto } from './dto/signup.dto';
-import { Response } from 'express';
+import { Response, Request as ExpressRequest } from 'express';
 
 @Controller('auth')
 export class AuthController {
@@ -30,6 +30,25 @@ export class AuthController {
       return { message: 'Email successfully verified!' };
     } else {
       return { message: 'Invalid verification code' };
+    }
+  }
+
+  @Get('signout')
+  async signout(@Res() res: Response): Promise<void> {
+    res.clearCookie('auth_token'); // Clear the cookie on sign out
+    res.status(200).json({ message: 'Successfully signed out' });
+  }
+
+  @Get('protected-route')
+  async checkAuth(
+    @Req() req: ExpressRequest,
+    @Res() res: Response,
+  ): Promise<void> {
+    try {
+      const user = this.authService.validateToken(req); // Validate the token
+      res.status(200).json({ message: 'Access granted', user }); // Send back user info
+    } catch (error) {
+      res.status(401).json({ message: error.message }); // Send unauthorized if token is invalid
     }
   }
 }
