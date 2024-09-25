@@ -14,8 +14,8 @@ export class ConditionalPostAuthMiddleware implements NestMiddleware {
 
     // Check if the filter is 'my-posts', which requires authentication
     if (filter === 'my-posts') {
-      const token = req.headers['authorization']?.split(' ')[1];
-
+      //const token = req.headers['authorization']?.split(' ')[1];
+      const token = req.cookies['auth_token'];
       if (!token) {
         throw new UnauthorizedException('Authentication is required');
       }

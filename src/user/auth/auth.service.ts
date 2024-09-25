@@ -15,6 +15,7 @@ import * as sgMail from '@sendgrid/mail';
 import { EmailService } from 'src/thirdParty/sg/email.service';
 import { PasswordHelper } from './password.helper';
 import { Role as RoleEnum } from '../dto/role.enum'; // Import Role enum
+import { Response } from 'express';
 dotenv.config();
 
 @Injectable()
@@ -76,7 +77,7 @@ export class AuthService {
     return null;
   }
 
-  async login(loginDto: LoginDto): Promise<string> {
+  async login(loginDto: LoginDto, res: Response): Promise<void> {
     const user = await this.userRepository.findOne({
       where: { email: loginDto.email },
       select: [
@@ -114,11 +115,19 @@ export class AuthService {
       );
     }
     const role: RoleEnum = user.role.name as RoleEnum; // Cast as Role enum
-    return generateToken({
+    const token = generateToken({
       id: user.id,
       name: user.name,
       email: user.email,
       role: role,
+    });
+
+    // Set the token as a cookie in the response
+    res.cookie('auth_token', token, {
+      //httpOnly: true, // Prevent access to the cookie from client-side JavaScript
+      secure: false, // Set to true in production (HTTPS)
+      maxAge: 3600000, // 1 hour
+      //sameSite: 'strict', // Protect against CSRF attacks
     });
   }
 }
