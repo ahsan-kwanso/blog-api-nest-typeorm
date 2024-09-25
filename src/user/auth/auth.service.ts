@@ -132,7 +132,7 @@ export class AuthService {
     res.cookie('auth_token', token, {
       httpOnly: true, // Prevent access to the cookie from client-side JavaScript
       secure: false, // Set to true in production (HTTPS)
-      maxAge: 3600000, // 1 hour
+      maxAge: 86400000, // 1 hour
       sameSite: 'strict', // Protect against CSRF attacks
     });
   }
