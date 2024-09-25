@@ -6,6 +6,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { ConfigService } from '@nestjs/config';
 import { Repository } from 'typeorm';
 import { User } from 'src/user/user.entity'; // Updated import path
 import { SignupDto } from './dto/signup.dto';
@@ -26,8 +27,12 @@ export class AuthService {
     private readonly userRepository: Repository<User>,
     private readonly emailService: EmailService,
     private readonly passwordHelper: PasswordHelper,
+    private readonly configService: ConfigService, // Inject ConfigService
   ) {
-    sgMail.setApiKey(process.env.SENDGRID_API_KEY!);
+    // Use ConfigService to get the SendGrid API key
+    sgMail.setApiKey(
+      this.configService.get<string>('SENDGRID_API_KEY') || 'your Key',
+    ); // Use ConfigService
   }
 
   async signup(signupDto: SignupDto): Promise<string> {
@@ -46,7 +51,7 @@ export class AuthService {
       //RoleId: 1, // by default user
     });
     // Send the verification code to the user's email
-    const verificationLink = `${process.env.APP_URL}/verify-email?token=${verificationToken}`;
+    const verificationLink = `${this.configService.get('APP_URL')}/verify-email?token=${verificationToken}`;
     await this.emailService.sendVerificationEmail(
       signupDto.email,
       verificationLink,
@@ -105,7 +110,7 @@ export class AuthService {
 
     if (user && !user.isVerified) {
       const verificationToken = user.verificationToken;
-      const verificationLink = `${process.env.APP_URL}/verify-email?token=${verificationToken}`;
+      const verificationLink = `${this.configService.get('APP_URL')}/verify-email?token=${verificationToken}`;
       await this.emailService.sendVerificationEmail(
         user.email,
         verificationLink,
