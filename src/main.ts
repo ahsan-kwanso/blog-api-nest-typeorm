@@ -19,7 +19,7 @@ async function bootstrap() {
   app.useGlobalFilters(new HttpExceptionFilter());
   app.useGlobalPipes(
     new ValidationPipe({
-      whitelist: false, // Not Automatically strip out properties not in the DTO
+      whitelist: true, //If set to true, validator will strip validated (returned) object of any properties that do not use any validation decorators.
       forbidNonWhitelisted: true, // Throw an error if non-whitelisted properties are provided
       transform: true, // Automatically transform input to match the expected types
     }),

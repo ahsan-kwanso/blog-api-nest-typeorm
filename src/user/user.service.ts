@@ -107,8 +107,8 @@ export class UserService {
 
   async findAllPaginated(
     req: ExpressRequest,
-    page: number = paginationConfig.defaultPage,
-    limit: number = paginationConfig.defaultLimit,
+    page: number,
+    limit: number,
     role?: string,
     sortBy?: string,
     sortOrder?: 'asc' | 'desc',
@@ -266,7 +266,6 @@ export class UserService {
 
       // Get signed URL
       const signedUrl = await this.fileUploadService.getSignedUrlS(fileKey);
-
       user.profilePictureUrl = signedUrl;
       await this.userRepository.save(user);
 

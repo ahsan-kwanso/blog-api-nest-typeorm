@@ -43,7 +43,6 @@ export class FileUploadService {
           ContentType: file.mimetype,
         }),
       );
-
       // Return file key for further use
       return fileKey;
     } catch (error) {
@@ -53,7 +52,6 @@ export class FileUploadService {
   async getSignedUrlS(fileKey: string): Promise<string> {
     try {
       // Generate signed URL with expiration time
-      console.log(typeof fileKey, fileKey);
       const signedUrl = await getSignedUrl(
         this.s3Client,
         new GetObjectCommand({
@@ -62,7 +60,6 @@ export class FileUploadService {
         }),
         { expiresIn: 360000 },
       );
-      console.log(signedUrl);
       return signedUrl;
     } catch (error) {
       throw new InternalServerErrorException('Error generating signed URL');

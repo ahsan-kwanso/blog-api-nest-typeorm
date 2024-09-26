@@ -37,34 +37,29 @@ export class PostController {
 
   @Get()
   async getPosts(
-    @Query() paginationQuery: PaginationQueryDto,
-    @Query('filter') filter: string, // Additional query parameter
-    @Query('userId') userId: string,
-    @Req() req: ExpressRequest, // Add the request object
+    @Query() paginationQuery: PaginationQueryDto, // Use the updated DTO for pagination and filters
+    @Req() req: ExpressRequest,
   ): Promise<PaginatedPostsResponse> {
     return await this.postService.getPosts(
-      filter,
-      userId,
-      paginationQuery,
+      paginationQuery.filter ?? '', // Use filter from pagination query
+      paginationQuery.userId ?? 0, // Use userId from pagination query
+      paginationQuery, // Pass the entire pagination query DTO
       req,
     );
   }
 
   @Get('/search')
   async searchPosts(
-    @Query() paginationQuery: PaginationQueryDto,
-    @Query('title') title: string,
-    @Query('filter') filter: string,
-    @Query('userId') userId: string,
+    @Query() paginationQuery: PaginationQueryDto, // Use the updated DTO for pagination and filters
     @Req() req: ExpressRequest,
   ): Promise<PaginatedPostsResponse> {
     return await this.postService.searchPosts(
-      title,
+      paginationQuery.title ?? '',
       paginationQuery.page,
       paginationQuery.limit,
       req,
-      filter, // Pass the filter to the service
-      userId ? parseInt(userId) : undefined, // Pass userId only if it's present
+      paginationQuery.filter, // Pass the filter from pagination query
+      paginationQuery.userId, // Pass userId only if it's present
     );
   }
 

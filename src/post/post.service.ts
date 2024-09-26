@@ -45,7 +45,7 @@ export class PostService {
 
   async getPosts(
     filter: string,
-    userId: string,
+    userId: number,
     paginationQuery: PaginationQueryDto,
     req: ExpressRequest,
   ) {
@@ -56,7 +56,7 @@ export class PostService {
       }
 
       // Ensure the authenticated user matches the userId in the query
-      if (parseInt(userId) !== req.user.id) {
+      if (userId !== req.user.id) {
         throw new ForbiddenException('You do not have permissions');
       }
 
