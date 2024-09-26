@@ -41,8 +41,6 @@ export class PostController {
     @Req() req: ExpressRequest,
   ): Promise<PaginatedPostsResponse> {
     return await this.postService.getPosts(
-      paginationQuery.filter ?? '', // Use filter from pagination query
-      paginationQuery.userId ?? 0, // Use userId from pagination query
       paginationQuery, // Pass the entire pagination query DTO
       req,
     );
@@ -53,13 +51,14 @@ export class PostController {
     @Query() paginationQuery: PaginationQueryDto, // Use the updated DTO for pagination and filters
     @Req() req: ExpressRequest,
   ): Promise<PaginatedPostsResponse> {
+    const { title, page, limit, filter, userId } = paginationQuery;
     return await this.postService.searchPosts(
-      paginationQuery.title ?? '',
-      paginationQuery.page,
-      paginationQuery.limit,
+      title ?? '',
+      page,
+      limit,
       req,
-      paginationQuery.filter, // Pass the filter from pagination query
-      paginationQuery.userId, // Pass userId only if it's present
+      filter, // Pass the filter from pagination query
+      userId, // Pass userId only if it's present
     );
   }
 

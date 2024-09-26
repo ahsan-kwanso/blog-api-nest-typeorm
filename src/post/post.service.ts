@@ -43,12 +43,8 @@ export class PostService {
     return await this.postRepository.find();
   }
 
-  async getPosts(
-    filter: string,
-    userId: number,
-    paginationQuery: PaginationQueryDto,
-    req: ExpressRequest,
-  ) {
+  async getPosts(paginationQuery: PaginationQueryDto, req: ExpressRequest) {
+    const { filter, userId } = paginationQuery;
     // If 'filter' is 'my-posts', ensure the user is authenticated and matches userId
     if (filter === 'my-posts') {
       if (!req.user) {
