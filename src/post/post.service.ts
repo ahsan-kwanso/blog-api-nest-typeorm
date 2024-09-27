@@ -65,7 +65,7 @@ export class PostService {
   }
 
   async getMyPosts(
-    userId: number,
+    userId: number, //currUserId
     paginationQuery: PaginationQueryDto,
     req: ExpressRequest,
   ): Promise<PaginatedPostsResponse> {

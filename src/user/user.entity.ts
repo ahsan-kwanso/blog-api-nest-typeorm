@@ -29,7 +29,7 @@ export class User extends BaseEntity {
   @Column({ type: 'int', nullable: false, default: 1 })
   RoleId: number;
 
-  // add a foreign key reference to the Role table
+  // add a foreign key reference to the Role table, see many to many
   @ManyToOne(() => Role, { eager: true })
   @JoinColumn({ name: 'RoleId' }) // Links to role table
   role: Role;

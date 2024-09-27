@@ -169,6 +169,7 @@ getRawMany will only return selected entities from table while getMany will retu
 
 keep async await managed
 
+circular dependancy, nest concepts, presentation.
 
 /*
 / package.json explore ---- done
@@ -281,4 +282,7 @@ add expiration time, to jwt token, study about session based authentication
 
 implemented session based authentication using cookies now, so so far everything is completed
 
-make jwt validation service class based
+make jwt validation service class based --- done
+
+
+remove that on module init instead write seeder for that role table

@@ -12,7 +12,7 @@ import { User } from 'src/user/user.entity'; // Updated import path
 import { SignupDto } from './dto/signup.dto';
 import { LoginDto } from './dto/login.dto';
 import * as sgMail from '@sendgrid/mail';
-import { EmailService } from 'src/thirdParty/sg/email.service';
+import { EmailService } from 'src/integrations/sg/email.service';
 import { PasswordHelper } from './password.helper';
 import { Role as RoleEnum } from '../dto/role.enum'; // Import Role enum
 import { Response, Request as ExpressRequest } from 'express';
@@ -132,7 +132,7 @@ export class AuthService {
     res.cookie('auth_token', token, {
       httpOnly: true, // Prevent access to the cookie from client-side JavaScript
       secure: false, // Set to true in production (HTTPS)
-      maxAge: 86400000, // 1 hour
+      maxAge: 86400000, // 1 day
       sameSite: 'strict', // Protect against CSRF attacks
     });
   }

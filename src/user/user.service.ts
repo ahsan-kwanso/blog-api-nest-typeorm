@@ -18,7 +18,7 @@ import paginationConfig from 'src/utils/pagination.config';
 import { Request as ExpressRequest } from 'express';
 import { UrlGeneratorService } from 'src/utils/pagination.util';
 import { Repository } from 'typeorm';
-import { FileUploadService } from 'src/thirdParty/s3/file-upload.service';
+import { FileUploadService } from 'src/integrations/s3/file-upload.service';
 
 @Injectable()
 export class UserService {
@@ -217,7 +217,15 @@ export class UserService {
     }
 
     // Update user properties with the DTO values
-    Object.assign(user, updateUserDto);
+    if (updateUserDto.RoleId) {
+      const role = await this.roleRepository.findOne({
+        where: { id: updateUserDto.RoleId },
+      });
+      if (!role) {
+        throw new NotFoundException('Role not found');
+      }
+      user.role = role; // Assign the Role entity instead of just setting RoleId
+    }
 
     // Save the updated user
     await this.userRepository.save(user);

@@ -21,7 +21,6 @@ export class UpdateUserDto {
   @IsOptional()
   password?: string;
 
-  @IsEnum(['admin', 'user'])
   @IsOptional()
-  role?: Role;
+  RoleId?: number;
 }

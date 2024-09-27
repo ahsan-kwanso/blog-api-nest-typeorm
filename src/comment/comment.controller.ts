@@ -24,9 +24,8 @@ export class CommentController {
   @Post()
   async create(
     @Body() createCommentDto: CreateCommentDto,
-    @Req() req: Request,
+    @LoggedInUserId() userId: number,
   ): Promise<Comment> {
-    const userId = req.user.id; // Extract UserId from JWT token
     return await this.commentService.create(createCommentDto, userId);
   }
 
