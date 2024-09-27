@@ -4,27 +4,27 @@ import { Repository } from 'typeorm';
 import { Role } from './role.entity';
 
 @Injectable()
-export class RoleService implements OnModuleInit {
+export class RoleService {
   constructor(
     @InjectRepository(Role)
     private readonly roleRepository: Repository<Role>,
   ) {}
 
-  async onModuleInit() {
-    // Check if roles already exist
-    const userRole = await this.roleRepository.findOne({
-      where: { name: 'user' },
-    });
-    const adminRole = await this.roleRepository.findOne({
-      where: { name: 'admin' },
-    });
+  // async onModuleInit() {
+  //   // Check if roles already exist
+  //   const userRole = await this.roleRepository.findOne({
+  //     where: { name: 'user' },
+  //   });
+  //   const adminRole = await this.roleRepository.findOne({
+  //     where: { name: 'admin' },
+  //   });
 
-    if (!userRole) {
-      await this.roleRepository.save({ name: 'user' });
-    }
+  //   if (!userRole) {
+  //     await this.roleRepository.save({ name: 'user' });
+  //   }
 
-    if (!adminRole) {
-      await this.roleRepository.save({ name: 'admin' });
-    }
-  }
+  //   if (!adminRole) {
+  //     await this.roleRepository.save({ name: 'admin' });
+  //   }
+  // }
 }

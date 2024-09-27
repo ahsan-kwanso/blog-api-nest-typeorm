@@ -6,7 +6,7 @@ import {
   NestModule,
 } from '@nestjs/common';
 import { APP_PIPE, APP_GUARD } from '@nestjs/core';
-import { DatabaseModule } from './modules/database.module';
+import { DatabaseModule } from './config/database.module';
 import { UserModule } from './user/user.module';
 import { PostModule } from './post/post.module';
 import { CommentModule } from './comment/comment.module';
