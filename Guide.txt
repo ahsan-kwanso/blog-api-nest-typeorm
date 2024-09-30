@@ -141,6 +141,7 @@ Covert that jwt util to class based at the end
 
 
 
+
 Shifting to TypeORM, basic setup done, created a dataSource file, then added scripts in package.json, make a database module, use that module in app module
 
 created migrations
@@ -286,3 +287,7 @@ make jwt validation service class based --- done
 
 
 remove that on module init instead write seeder for that role table
+
+
+
+Started conversion from rest to graphql
