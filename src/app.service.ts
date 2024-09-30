@@ -1,7 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { Resolver, Query } from '@nestjs/graphql';
+import { GraphQLString } from 'graphql';
 
-@Injectable()
-export class AppService {
+@Resolver()
+export class AppResolver {
+  @Query(() => GraphQLString)
   getHello(): string {
     return 'Hello World!';
   }

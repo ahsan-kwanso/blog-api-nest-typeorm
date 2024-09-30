@@ -16,6 +16,10 @@ import { RolesGuard } from './common/roles.guard';
 import { ConfigModule } from '@nestjs/config';
 import { ConditionalPostAuthMiddleware } from './common/cond.auth.middleware';
 import { JwtModule } from './utils/jwt.module';
+import { GraphQLModule } from '@nestjs/graphql';
+import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
+import { join } from 'path'; // Needed for schema file path
+import { AppResolver } from './app.service';
 
 @Module({
   imports: [
@@ -26,6 +30,12 @@ import { JwtModule } from './utils/jwt.module';
     CommentModule,
     AuthModule,
     JwtModule,
+    // Adding GraphQL Module
+    GraphQLModule.forRoot<ApolloDriverConfig>({
+      driver: ApolloDriver,
+      autoSchemaFile: join(process.cwd(), 'src/schema.gql'), // Automatically generates schema.gql
+      sortSchema: true, // Sorts the schema output
+    }),
   ],
   providers: [
     {
@@ -36,6 +46,7 @@ import { JwtModule } from './utils/jwt.module';
       provide: APP_PIPE,
       useClass: ValidationPipe,
     },
+    AppResolver,
   ],
 })
 export class AppModule implements NestModule {
