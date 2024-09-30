@@ -57,14 +57,14 @@ export class PostService {
       }
 
       // Fetch posts specific to the user
-      return await this.getMyPosts(req.user.id, paginationQuery, req);
+      return await this.getCurrUserPosts(req.user.id, paginationQuery, req);
     }
 
     // For non-'my-posts', fetch public posts
-    return await this.getPublicPosts(paginationQuery, req);
+    return await this.getAllPosts(paginationQuery, req);
   }
 
-  async getMyPosts(
+  async getCurrUserPosts(
     userId: number, //currUserId
     paginationQuery: PaginationQueryDto,
     req: ExpressRequest,
@@ -73,7 +73,7 @@ export class PostService {
     return await this.fetchPosts(userId, paginationQuery, req);
   }
 
-  async getPublicPosts(
+  async getAllPosts(
     paginationQuery: PaginationQueryDto,
     req: ExpressRequest,
   ): Promise<PaginatedPostsResponse> {

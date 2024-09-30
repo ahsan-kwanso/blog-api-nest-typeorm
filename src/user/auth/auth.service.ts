@@ -11,7 +11,6 @@ import { Repository } from 'typeorm';
 import { User } from 'src/user/user.entity'; // Updated import path
 import { SignupDto } from './dto/signup.dto';
 import { LoginDto } from './dto/login.dto';
-import * as sgMail from '@sendgrid/mail';
 import { EmailService } from 'src/integrations/sg/email.service';
 import { PasswordHelper } from './password.helper';
 import { Role as RoleEnum } from '../dto/role.enum'; // Import Role enum
@@ -28,12 +27,7 @@ export class AuthService {
     private readonly passwordHelper: PasswordHelper,
     private readonly configService: ConfigService, // Inject ConfigService
     private readonly jwtService: JwtService,
-  ) {
-    // Use ConfigService to get the SendGrid API key
-    sgMail.setApiKey(
-      this.configService.get<string>('SENDGRID_API_KEY') || 'your Key',
-    ); // Use ConfigService
-  }
+  ) {}
 
   async signup(signupDto: SignupDto): Promise<string> {
     const verificationToken = crypto.randomBytes(32).toString('hex'); // Generate a 6-character code
