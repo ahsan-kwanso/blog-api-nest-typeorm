@@ -1,12 +1,12 @@
 import { Body, Controller, Post, Res, Get, Req } from '@nestjs/common';
-import { AuthService } from './auth.service';
+import { UserService } from './user.service';
 import { LoginDto } from './dto/login.dto';
 import { SignupDto } from './dto/signup.dto';
 import { Response, Request as ExpressRequest } from 'express';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(private readonly authService: UserService) {}
 
   @Post('signup')
   async signup(@Body() signupDto: SignupDto): Promise<{ message: string }> {
@@ -16,7 +16,7 @@ export class AuthController {
 
   @Post('signin')
   async login(@Body() loginDto: LoginDto, @Res() res: Response): Promise<void> {
-    await this.authService.login(loginDto, res);
+    await this.authService.login(loginDto, res); //handle it in interceptor
     // no need to send token as it is stored in cookie
     res.send({ message: 'Login successful' });
   }

@@ -16,7 +16,6 @@ import {
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { UserService } from './user.service';
-import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PaginationQueryDto } from '../common/pagination.dto';
 import { Request as ExpressRequest } from 'express';
@@ -54,18 +53,6 @@ const limits = {
 @Controller('users')
 export class UserController {
   constructor(private readonly userService: UserService) {}
-
-  @Post()
-  async create(@Body() createUserDto: CreateUserDto) {
-    return await this.userService.create(createUserDto);
-  }
-
-  @Get('/v1')
-  @UseGuards(RolesGuard)
-  @Roles(Role.ADMIN)
-  async findAll() {
-    return await this.userService.findAll();
-  }
 
   @Get()
   @UseGuards(RolesGuard)

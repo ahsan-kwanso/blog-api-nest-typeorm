@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Post } from 'src/post/post.entity';
-import { User } from 'src/user/user.entity';
+import { User } from 'src/user/entities/user.entity';
 import { PostService } from './post.service';
 import { PostController } from './post.controller';
 import { UrlGeneratorService } from 'src/utils/pagination.util';

@@ -10,7 +10,6 @@ import { DatabaseModule } from './config/database.module';
 import { UserModule } from './user/user.module';
 import { PostModule } from './post/post.module';
 import { CommentModule } from './comment/comment.module';
-import { AuthModule } from './user/auth/auth.module';
 import { AuthMiddleware } from './common/auth.middleware';
 import { RolesGuard } from './common/roles.guard';
 import { ConfigModule } from '@nestjs/config';
@@ -24,7 +23,6 @@ import { JwtModule } from './utils/jwt.module';
     UserModule,
     PostModule,
     CommentModule,
-    AuthModule,
     JwtModule,
   ],
   providers: [
