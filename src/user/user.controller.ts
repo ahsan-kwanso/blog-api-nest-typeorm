@@ -23,6 +23,7 @@ import { Roles } from '../common/roles.decorator';
 import { Role } from 'src/user/dto/role.enum';
 import { RolesGuard } from '../common/roles.guard';
 import { LoggedInUserId } from 'src/common/LoggedInUserId.decorator';
+import { UrlExtractionInterceptor } from 'src/common/url.interceptor';
 
 const MAX_FILE_SIZE_MB = 10;
 const ALLOWED_MIME_TYPES = [
@@ -57,13 +58,19 @@ export class UserController {
   @Get()
   @UseGuards(RolesGuard)
   @Roles(Role.ADMIN)
+  @UseInterceptors(UrlExtractionInterceptor)
   async findAllPag(
     @Req() req: ExpressRequest,
     @Query() paginationQuery?: PaginationQueryDto,
   ) {
     const { page, limit, sortBy, sortOrder, role } = paginationQuery || {};
+    const { baseUrl, queryParams } = req.urlData || {
+      baseUrl: '',
+      queryParams: {},
+    };
     return await this.userService.findAllPaginated(
-      req,
+      baseUrl,
+      queryParams,
       page!,
       limit!,
       role,

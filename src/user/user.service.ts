@@ -40,16 +40,14 @@ export class UserService {
   ) {}
 
   async findAllPaginated(
-    req: ExpressRequest,
+    baseUrl: string,
+    queryParams: any,
     page: number,
     limit: number,
     role?: string,
     sortBy?: string,
     sortOrder?: 'asc' | 'desc',
   ): Promise<PaginatedUserWithNumberOfPosts> {
-    const pageSize = Number(limit);
-    const pageNumber = Number(page);
-
     // Construct order clause based on sortBy and sortOrder
     const order: { [key: string]: 'ASC' | 'DESC' } = {};
     if (sortBy) {
@@ -70,8 +68,8 @@ export class UserService {
       ])
       .groupBy('user.id') // Group by user ID
       .addGroupBy('role.name') // Group by role name
-      .offset((pageNumber - 1) * pageSize) // Offset for pagination
-      .limit(pageSize); // Limit the results
+      .offset((page - 1) * limit) // Offset for pagination
+      .limit(limit); // Limit the results
 
     if (role) {
       queryBuilder.andWhere('role.name = :role', { role }); // Corrected to access role name
@@ -104,22 +102,22 @@ export class UserService {
       posts: Number(user.postscount), // Cast posts count to a number
     }));
 
-    const totalPages = Math.ceil(totalCount / pageSize);
-    const nextPage = pageNumber < totalPages ? pageNumber + 1 : null;
+    const totalPages = Math.ceil(totalCount / limit);
+    const nextPage = page < totalPages ? page + 1 : null;
 
     return {
       users: userWithNumberOfPosts,
       total: totalCount,
-      page: pageNumber,
-      pageSize: pageSize,
-      nextPage: this.urlGeneratorService.generateNextPageUrl(
+      page: page,
+      pageSize: limit,
+      nextPage: this.urlGeneratorService.generateNextPageUrl2(
         nextPage,
-        pageSize,
-        req,
+        limit,
+        baseUrl,
+        queryParams,
       ),
     };
   }
-
   async findOne(id: number): Promise<User> {
     const user = await this.userRepository.findOne({
       where: { id },
