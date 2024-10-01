@@ -1,9 +1,18 @@
-import { Body, Controller, Post, Res, Get, Req } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Post,
+  Res,
+  Get,
+  Req,
+  UseInterceptors,
+} from '@nestjs/common';
 import { UserService } from './user.service';
 import { LoginDto } from './dto/login.dto';
 import { SignupDto } from './dto/signup.dto';
 import { Response, Request as ExpressRequest } from 'express';
 import { Public } from 'src/common/public.decorator';
+import { SetAuthTokenInterceptor } from 'src/common/set-auth-token.interceptor';
 
 @Controller('auth')
 export class AuthController {
@@ -18,10 +27,12 @@ export class AuthController {
 
   @Public()
   @Post('signin')
-  async login(@Body() loginDto: LoginDto, @Res() res: Response): Promise<void> {
-    await this.authService.login(loginDto, res); //handle it in interceptor
-    // no need to send token as it is stored in cookie
-    res.send({ message: 'Login successful' });
+  @UseInterceptors(SetAuthTokenInterceptor) // Apply the interceptor here for cookie setting
+  async login(
+    @Body() loginDto: LoginDto,
+  ): Promise<{ message: string; token: string }> {
+    const token = await this.authService.login(loginDto); // This should return the token
+    return { message: 'Login successful', token }; // Return token for interceptor to process
   }
 
   @Public()

@@ -260,7 +260,7 @@ export class UserService {
     return null;
   }
 
-  async login(loginDto: LoginDto, res: Response): Promise<void> {
+  async login(loginDto: LoginDto): Promise<string> {
     const user = await this.userRepository.findOne({
       where: { email: loginDto.email },
       select: [
@@ -271,7 +271,7 @@ export class UserService {
         'role',
         'isVerified',
         'verificationToken',
-      ], // Manually select password
+      ],
       relations: ['role'],
     });
 
@@ -297,7 +297,8 @@ export class UserService {
         'Email not verified. A verification link has been sent to your email.',
       );
     }
-    const role: RoleEnum = user.role.name as RoleEnum; // Cast as Role enum
+
+    const role: RoleEnum = user.role.name as RoleEnum;
     const token = this.jwtService.generateToken({
       id: user.id,
       name: user.name,
@@ -305,13 +306,8 @@ export class UserService {
       role: role,
     });
 
-    // Set the token as a cookie in the response
-    res.cookie('auth_token', token, {
-      httpOnly: true, // Prevent access to the cookie from client-side JavaScript
-      secure: false, // Set to true in production (HTTPS)
-      maxAge: 86400000, // 1 day
-      sameSite: 'strict', // Protect against CSRF attacks
-    });
+    // Return the token without setting the cookie
+    return token;
   }
 
   validateToken(req: ExpressRequest) {
