@@ -7,6 +7,10 @@ declare global {
       cookies: {
         [key: string]: string;
       };
+      urlData?: {
+        baseUrl: string;
+        queryParams: any; // You can define a more specific type if needed
+      };
     }
   }
 }

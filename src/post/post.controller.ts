@@ -10,6 +10,7 @@ import {
   Req,
   UseGuards,
   Put,
+  UseInterceptors,
 } from '@nestjs/common';
 import { Request as ExpressRequest } from 'express';
 import { PaginationQueryDto } from '../common/pagination.dto';
@@ -23,6 +24,7 @@ import { LoggedInUserRole } from 'src/common/LoggedInUserRole.decorator';
 import { Role } from 'src/user/dto/role.enum';
 import { ConditionalAuthGuard } from 'src/common/conditional.auth.guard';
 import { Public } from 'src/common/public.decorator';
+import { UrlExtractionInterceptor } from 'src/common/url.interceptor';
 
 @Controller('posts')
 export class PostController {
@@ -52,19 +54,24 @@ export class PostController {
 
   @Public()
   @UseGuards(ConditionalAuthGuard)
+  @UseInterceptors(UrlExtractionInterceptor)
   @Get('/search')
   async searchPosts(
     @Query() paginationQuery: PaginationQueryDto, // Use the updated DTO for pagination and filters
     @Req() req: ExpressRequest,
   ): Promise<PaginatedPostsResponse> {
     const { title, page, limit, filter, userId } = paginationQuery;
+    const { baseUrl, queryParams } = req.urlData || {
+      baseUrl: '',
+      queryParams: {},
+    };
     return await this.postService.searchPosts(
       title ?? '',
       page,
       limit,
-      req,
       filter, // Pass the filter from pagination query
-      userId, // Pass userId only if it's present
+      queryParams, // Pass the extracted query parameters if needed
+      baseUrl, // Pass the base URL for URL generation
     );
   }
 

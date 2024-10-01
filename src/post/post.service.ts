@@ -133,33 +133,26 @@ export class PostService {
     title: string,
     page: number = paginationConfig.defaultPage,
     limit: number = paginationConfig.defaultLimit,
-    req: ExpressRequest,
-    filter?: string, // Filter to differentiate between all posts and my-posts
-    userId?: number, // Optional userId for filtering user-specific posts
+    filter?: string, // Filter for 'my-posts' etc.
+    queryParams?: any, // Pass query parameters if needed
+    baseUrl?: string, // Pass base URL for URL generation
   ): Promise<PaginatedPostsResponse> {
     const pageSize = Number(limit);
     const pageNumber = Number(page);
 
-    // Initialize query builder to search posts by title
     const queryBuilder: SelectQueryBuilder<Post> = this.postRepository
       .createQueryBuilder('post')
-      .leftJoinAndSelect('post.user', 'user') // Eager load the user relation
-      .where('post.title ILIKE :title', { title: `%${title}%` }); // Case-insensitive search for title
+      .leftJoinAndSelect('post.user', 'user')
+      .where('post.title ILIKE :title', { title: `%${title}%` });
 
-    // Handle the 'my-posts' filter by checking authentication and userId
+    // Handle 'my-posts' filter
     if (filter === 'my-posts') {
-      // Ensure the user is authenticated
-      if (!req.user) {
+      // You should have userId available from your context or however you implement it
+      const userId = queryParams?.userId; // Assuming userId comes from query params
+      if (!userId) {
         throw new ForbiddenException('Authentication is required');
       }
-
-      // Check if the authenticated user's ID matches the userId in the query
-      if (userId && userId !== req.user.id) {
-        throw new ForbiddenException('You do not have permissions');
-      }
-
-      // Filter posts by the current user's ID
-      queryBuilder.andWhere('post.UserId = :userId', { userId: req.user.id });
+      queryBuilder.andWhere('post.UserId = :userId', { userId });
     }
 
     // Apply pagination and sorting
@@ -168,19 +161,16 @@ export class PostService {
       .skip((pageNumber - 1) * pageSize)
       .orderBy('post.createdAt', 'DESC');
 
-    // Execute the query and get the results
     const [posts, total] = await queryBuilder.getManyAndCount();
 
-    // Map posts to required format
-    const formattedPosts: PostResponse[] = posts.map((post) => ({
+    const formattedPosts = posts.map((post) => ({
       id: post.id,
-      author: post.user?.name || 'Unknown', // Access the user's name
+      author: post.user?.name || 'Unknown',
       title: post.title,
       content: post.content,
-      date: post.updatedAt, // Format date as YYYY-MM-DD
+      date: post.updatedAt,
     }));
 
-    // Calculate pagination details
     const totalPages = Math.ceil(total / pageSize);
     const nextPage = pageNumber < totalPages ? pageNumber + 1 : null;
 
@@ -189,10 +179,11 @@ export class PostService {
       total,
       page: pageNumber,
       pageSize: pageSize,
-      nextPage: this.urlGeneratorService.generateNextPageUrl(
+      nextPage: this.urlGeneratorService.generateNextPageUrl2(
         nextPage,
         pageSize,
-        req,
+        baseUrl!,
+        queryParams,
       ),
     };
   }

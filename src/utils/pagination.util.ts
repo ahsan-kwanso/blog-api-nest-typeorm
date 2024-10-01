@@ -22,4 +22,23 @@ export class UrlGeneratorService {
 
     return `${baseUrl}?${queryParams}`;
   }
+
+  generateNextPageUrl2(
+    nextPage: number | null,
+    pageSize: number,
+    baseUrl: string,
+    queryParams: any,
+  ): string | null {
+    if (nextPage === null || nextPage === undefined) return null;
+
+    // Append pagination parameters to the existing query string
+    const updatedQueryParams = {
+      ...queryParams,
+      page: nextPage,
+      limit: pageSize,
+    };
+
+    const queryString = qs.stringify(updatedQueryParams);
+    return `${baseUrl}?${queryString}`;
+  }
 }
