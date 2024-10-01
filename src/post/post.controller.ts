@@ -41,14 +41,25 @@ export class PostController {
 
   @Public() // by pass global guard
   @UseGuards(ConditionalAuthGuard)
+  @UseInterceptors(UrlExtractionInterceptor)
   @Get()
   async getPosts(
     @Query() paginationQuery: PaginationQueryDto, // Use the updated DTO for pagination and filters
     @Req() req: ExpressRequest,
   ): Promise<PaginatedPostsResponse> {
+    const { page, limit, filter, userId } = paginationQuery;
+    const { baseUrl, queryParams, currUserId } = req.urlData || {
+      baseUrl: '',
+      queryParams: {},
+    };
     return await this.postService.getPosts(
-      paginationQuery, // Pass the entire pagination query DTO
-      req,
+      page,
+      limit,
+      filter, // Pass the filter from pagination query
+      userId,
+      queryParams, // Pass the extracted query parameters if needed
+      baseUrl, // Pass the base URL for URL generation
+      currUserId,
     );
   }
 
