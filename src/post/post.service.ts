@@ -134,8 +134,10 @@ export class PostService {
     page: number = paginationConfig.defaultPage,
     limit: number = paginationConfig.defaultLimit,
     filter?: string, // Filter for 'my-posts' etc.
+    userId?: number,
     queryParams?: any, // Pass query parameters if needed
     baseUrl?: string, // Pass base URL for URL generation
+    currUser?: number,
   ): Promise<PaginatedPostsResponse> {
     const pageSize = Number(limit);
     const pageNumber = Number(page);
@@ -148,9 +150,11 @@ export class PostService {
     // Handle 'my-posts' filter
     if (filter === 'my-posts') {
       // You should have userId available from your context or however you implement it
-      const userId = queryParams?.userId; // Assuming userId comes from query params
       if (!userId) {
         throw new ForbiddenException('Authentication is required');
+      }
+      if (userId !== currUser) {
+        throw new ForbiddenException('You do not have permissions');
       }
       queryBuilder.andWhere('post.UserId = :userId', { userId });
     }

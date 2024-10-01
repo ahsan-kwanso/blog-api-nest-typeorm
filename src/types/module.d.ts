@@ -10,6 +10,7 @@ declare global {
       urlData?: {
         baseUrl: string;
         queryParams: any; // You can define a more specific type if needed
+        currUserId: number;
       };
     }
   }

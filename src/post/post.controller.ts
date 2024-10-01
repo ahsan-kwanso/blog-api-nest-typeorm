@@ -61,7 +61,7 @@ export class PostController {
     @Req() req: ExpressRequest,
   ): Promise<PaginatedPostsResponse> {
     const { title, page, limit, filter, userId } = paginationQuery;
-    const { baseUrl, queryParams } = req.urlData || {
+    const { baseUrl, queryParams, currUserId } = req.urlData || {
       baseUrl: '',
       queryParams: {},
     };
@@ -70,8 +70,10 @@ export class PostController {
       page,
       limit,
       filter, // Pass the filter from pagination query
+      userId,
       queryParams, // Pass the extracted query parameters if needed
       baseUrl, // Pass the base URL for URL generation
+      currUserId,
     );
   }
 
