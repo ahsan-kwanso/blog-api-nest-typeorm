@@ -3,17 +3,20 @@ import { UserService } from './user.service';
 import { LoginDto } from './dto/login.dto';
 import { SignupDto } from './dto/signup.dto';
 import { Response, Request as ExpressRequest } from 'express';
+import { Public } from 'src/common/public.decorator';
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: UserService) {}
 
+  @Public()
   @Post('signup')
   async signup(@Body() signupDto: SignupDto): Promise<{ message: string }> {
     const message = await this.authService.signup(signupDto);
     return { message: message };
   }
 
+  @Public()
   @Post('signin')
   async login(@Body() loginDto: LoginDto, @Res() res: Response): Promise<void> {
     await this.authService.login(loginDto, res); //handle it in interceptor
@@ -21,6 +24,7 @@ export class AuthController {
     res.send({ message: 'Login successful' });
   }
 
+  @Public()
   @Post('verify-email')
   async verifyEmail(
     @Body('token') token: string,

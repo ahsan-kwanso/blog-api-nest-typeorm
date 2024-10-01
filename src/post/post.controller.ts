@@ -21,6 +21,8 @@ import { PaginatedPostsResponse } from './dto/post';
 import { LoggedInUserId } from 'src/common/LoggedInUserId.decorator';
 import { LoggedInUserRole } from 'src/common/LoggedInUserRole.decorator';
 import { Role } from 'src/user/dto/role.enum';
+import { ConditionalAuthGuard } from 'src/common/conditional.auth.guard';
+import { Public } from 'src/common/public.decorator';
 
 @Controller('posts')
 export class PostController {
@@ -35,6 +37,8 @@ export class PostController {
     return await this.postService.create(createPostDto, userId);
   }
 
+  @Public() // by pass global guard
+  @UseGuards(ConditionalAuthGuard)
   @Get()
   async getPosts(
     @Query() paginationQuery: PaginationQueryDto, // Use the updated DTO for pagination and filters
@@ -46,6 +50,8 @@ export class PostController {
     );
   }
 
+  @Public()
+  @UseGuards(ConditionalAuthGuard)
   @Get('/search')
   async searchPosts(
     @Query() paginationQuery: PaginationQueryDto, // Use the updated DTO for pagination and filters
