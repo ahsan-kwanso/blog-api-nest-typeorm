@@ -27,11 +27,11 @@ import { JwtModule } from './utils/jwt.module';
   providers: [
     {
       provide: APP_GUARD,
-      useClass: RolesGuard,
+      useClass: AuthGuard, // Apply AuthGuard globally
     },
     {
       provide: APP_GUARD,
-      useClass: AuthGuard, // Apply AuthGuard globally
+      useClass: RolesGuard,
     },
     {
       provide: APP_PIPE,
