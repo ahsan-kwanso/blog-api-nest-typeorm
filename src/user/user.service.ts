@@ -37,7 +37,10 @@ export class UserService {
     private readonly passwordHelper: PasswordHelper,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
-  ) {}
+  ) {
+    emailService.test = 20;
+    console.log(emailService.test);
+  }
 
   async findAllPaginated(
     baseUrl: string,

@@ -19,7 +19,9 @@ import { LoggedInUserId } from 'src/common/LoggedInUserId.decorator';
 
 @Controller('comments')
 export class CommentController {
-  constructor(private readonly commentService: CommentService) {}
+  constructor(private readonly commentService: CommentService) {
+    console.log('Comment Controller Constructor');
+  }
 
   @Post()
   async create(

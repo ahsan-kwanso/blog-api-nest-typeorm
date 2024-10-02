@@ -321,3 +321,8 @@ over fetching and under fetching
 From console logging in constructors get the basic flow of application
 and implement that interceptor concept and a decorator for getting the user all, not individual id or role etc.
 that response handling in interceptor means cookie setting
+
+
+modify element of some other module service, and access that somewhere else what will happen
+modify at separate place and access at separate place
+module initialization confirmed through constructor calls on startup they are initialized

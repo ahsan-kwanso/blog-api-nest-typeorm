@@ -28,7 +28,9 @@ import { UrlExtractionInterceptor } from 'src/common/url.interceptor';
 
 @Controller('posts')
 export class PostController {
-  constructor(private readonly postService: PostService) {}
+  constructor(private readonly postService: PostService) {
+    console.log('Post Controller Constructor');
+  }
 
   // Create a new post
   @Post()
