@@ -12,7 +12,7 @@ import { CommentService } from './comment.service';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';
 import { Comment } from 'src/comment/comment.entity';
-import { CommentsResult } from 'src/comment/dto/comment';
+import { CommentsResult } from 'src/comment/dto/comment.dto';
 import { LoggedInUserId } from 'src/common/LoggedInUserId.decorator';
 
 @Controller('comments')
