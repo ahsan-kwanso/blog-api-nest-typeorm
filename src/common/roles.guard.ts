@@ -5,6 +5,7 @@ import {
   ForbiddenException,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
+import { GqlExecutionContext } from '@nestjs/graphql';
 import { ROLES_KEY } from '../common/roles.decorator';
 import { Role } from 'src/user/dto/role.enum';
 
@@ -18,8 +19,10 @@ export class RolesGuard implements CanActivate {
       return true; // No roles specified, so allow access
     }
 
-    const request = context.switchToHttp().getRequest();
-    const user = request.user;
+    // Get the GraphQL context instead of HTTP request
+    const ctx = GqlExecutionContext.create(context).getContext();
+    const user = ctx.req.user; // Access user from GraphQL context's request
+
     if (!user || !roles.includes(user.role)) {
       throw new ForbiddenException('Access denied');
     }

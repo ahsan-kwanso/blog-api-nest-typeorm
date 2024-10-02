@@ -4,24 +4,20 @@ import {
   ExecutionContext,
   UnauthorizedException,
 } from '@nestjs/common';
-import { Reflector } from '@nestjs/core';
+import { GqlExecutionContext } from '@nestjs/graphql';
 import { JwtService } from 'src/utils/jwt.service';
-import { Request } from 'express';
 
 @Injectable()
 export class ConditionalAuthGuard implements CanActivate {
-  constructor(
-    private readonly jwtService: JwtService,
-    private readonly reflector: Reflector,
-  ) {}
+  constructor(private readonly jwtService: JwtService) {}
 
-  canActivate(context: ExecutionContext): boolean | Promise<boolean> {
-    const request = context.switchToHttp().getRequest<Request>();
-    const filter = request.query['filter']; // Check for the filter query parameter
+  async canActivate(context: ExecutionContext): Promise<boolean> {
+    const ctx = GqlExecutionContext.create(context).getContext();
+    const filter = ctx.req.query['filter']; // Extract 'filter' from GraphQL context's request query
 
     // If 'filter' is 'my-posts', enforce authentication
     if (filter === 'my-posts') {
-      const token = request.cookies['auth_token'];
+      const token = ctx.req.cookies['auth_token']; // Get token from cookies
 
       if (!token) {
         throw new UnauthorizedException('No token provided');
@@ -29,7 +25,7 @@ export class ConditionalAuthGuard implements CanActivate {
 
       try {
         const decoded = this.jwtService.verifyToken(token);
-        request.user = decoded; // Attach user info to the request object
+        ctx.req.user = decoded; // Attach user info to the request object
         return true; // Token is valid, grant access
       } catch (error) {
         throw new UnauthorizedException('Invalid token');

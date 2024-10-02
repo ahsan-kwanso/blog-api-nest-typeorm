@@ -3,15 +3,19 @@ import {
   ExecutionContext,
   UnauthorizedException,
 } from '@nestjs/common';
+import { GqlExecutionContext } from '@nestjs/graphql';
 
 export const UserInfo = createParamDecorator(
   (data: unknown, ctx: ExecutionContext): number => {
-    const request = ctx.switchToHttp().getRequest();
-    const user = request.user;
+    const gqlCtx = GqlExecutionContext.create(ctx); // Create GQL context
+    const request = gqlCtx.getContext().req; // Access the request object from GraphQL context
+    const user = request.user; // Get the user from the request
+
     if (!user || !user.id) {
       throw new UnauthorizedException('User not authenticated');
     }
-    return user;
+
+    return user; // Return user ID as a number (ensure it's cast correctly)
   },
 );
 

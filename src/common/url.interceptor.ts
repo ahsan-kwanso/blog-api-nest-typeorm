@@ -4,12 +4,15 @@ import {
   ExecutionContext,
   CallHandler,
 } from '@nestjs/common';
+import { GqlExecutionContext } from '@nestjs/graphql';
 import { Observable } from 'rxjs';
 
 @Injectable()
 export class UrlExtractionInterceptor implements NestInterceptor {
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
-    const request = context.switchToHttp().getRequest();
+    // Use GqlExecutionContext to extract the request from GraphQL context
+    const ctx = GqlExecutionContext.create(context).getContext();
+    const request = ctx.req;
 
     // Extract necessary data
     const protocol = request.protocol;
