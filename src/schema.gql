@@ -2,6 +2,16 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+type ActualComment {
+  ParentCommentId: Int
+  PostId: Int!
+  UserId: Int!
+  content: String!
+  createdAt: DateTime!
+  id: Int!
+  updatedAt: DateTime!
+}
+
 type Comment {
   ParentCommentId: Int
   PostId: Int!
@@ -14,6 +24,33 @@ type Comment {
   post: Post!
   updatedAt: DateTime!
   user: User!
+}
+
+type CommentData {
+  ParentCommentId: Int
+  PostId: Int!
+  UserId: Int!
+  content: String!
+  createdAt: DateTime!
+  id: Int!
+  subComments: [CommentData!]
+  updatedAt: DateTime!
+}
+
+type CommentsResult {
+  comments: [CommentData!]
+  message: String
+}
+
+input CreateCommentDto {
+  """ID of the parent comment if any"""
+  ParentCommentId: Int
+
+  """ID of the post the comment belongs to"""
+  PostId: Int!
+
+  """Content of the comment"""
+  content: String!
 }
 
 """
@@ -36,11 +73,14 @@ type Message {
 }
 
 type Mutation {
+  createComment(createCommentDto: CreateCommentDto!): Message!
   login(loginDto: LoginDto!): LoginResponse!
   remove(id: Int!): Message!
+  removeComment(id: Int!): Message!
   signout: Message!
   signup(signupDto: SignupDto!): Message!
   update(id: Int!, updateUserDto: UpdateUserDto!): User!
+  updateComment(id: Int!, updateCommentDto: UpdateCommentDto!): Message!
   verifyEmail(token: String!): Message!
 }
 
@@ -77,8 +117,11 @@ type Post {
 type Query {
   checkAuth: Message!
   currentUser: User!
+  findAllComments: [Comment!]!
   findAllPaginated(pagination: PaginationQueryDto!): PaginatedUserWithNumberOfPosts!
+  findCommentsOnPost(postId: Int!): CommentsResult!
   findOne(id: Int!): User!
+  findOneComment(id: Int!): Comment!
   getHello: String!
 }
 
@@ -92,6 +135,17 @@ input SignupDto {
   email: String!
   name: String!
   password: String!
+}
+
+input UpdateCommentDto {
+  """ID of the parent comment if any"""
+  ParentCommentId: Int
+
+  """ID of the post the comment belongs to"""
+  PostId: Int
+
+  """Content of the comment"""
+  content: String
 }
 
 input UpdateUserDto {

@@ -8,7 +8,7 @@ import { Role } from 'src/user/dto/role.enum';
 import { UseGuards, UseInterceptors } from '@nestjs/common';
 import { RolesGuard } from '../common/roles.guard';
 import { LoggedInUserId } from 'src/common/LoggedInUserId.decorator';
-import { Message } from './dto/message.dto';
+import { Message } from '../common/message.dto';
 import { PaginatedUserWithNumberOfPosts } from './dto/user.dto';
 import { UrlExtractionInterceptor } from 'src/common/url.interceptor';
 //   import { FileUpload, GraphQLUpload } from 'graphql-upload/Upload.mjs';

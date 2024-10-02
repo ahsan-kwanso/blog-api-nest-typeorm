@@ -8,7 +8,7 @@ import { UseInterceptors } from '@nestjs/common';
 import { Request } from 'express';
 import { Response } from 'express'; // Import Response for typing
 import { LoginResponse } from './dto/login-response.dto';
-import { Message } from './dto/message.dto';
+import { Message } from '../common/message.dto';
 
 interface GraphQLResponseContext {
   res: Response;
