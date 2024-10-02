@@ -18,6 +18,7 @@ import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { join } from 'path'; // Needed for schema file path
 import { AppResolver } from './app.service';
+import { Request, Response } from 'express'; // Import Express types
 
 @Module({
   imports: [
@@ -32,6 +33,10 @@ import { AppResolver } from './app.service';
       driver: ApolloDriver,
       autoSchemaFile: join(process.cwd(), 'src/schema.gql'), // Automatically generates schema.gql
       sortSchema: true, // Sorts the schema output
+      context: ({ req, res }: { req: Request; res: Response }) => ({
+        req,
+        res,
+      }), // Explicitly type req and res
     }),
   ],
   providers: [
