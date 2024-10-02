@@ -240,7 +240,6 @@ export class UserService {
     const user = await this.userRepository.findOne({
       where: { verificationToken: token },
     });
-
     if (!user) {
       throw new BadRequestException('Invalid verification token.');
     }
