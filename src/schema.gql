@@ -2,6 +2,57 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+type Comment {
+  ParentCommentId: Int
+  PostId: Int!
+  UserId: Int!
+  childComments: [Comment!]
+  content: String!
+  createdAt: DateTime!
+  id: Int!
+  parentComment: Comment
+  post: Post!
+  updatedAt: DateTime!
+  user: User!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+type Post {
+  UserId: Int!
+  comments: [Comment!]!
+  content: String!
+  createdAt: DateTime!
+  id: Int!
+  title: String!
+  updatedAt: DateTime!
+  user: User!
+}
+
 type Query {
   getHello: String!
+}
+
+type Role {
+  id: Int!
+  name: String!
+  users: [User!]!
+}
+
+type User {
+  RoleId: Int!
+  comments: [Comment!]!
+  createdAt: DateTime!
+  email: String!
+  id: Int!
+  isVerified: Boolean!
+  name: String!
+  posts: [Post!]!
+  profilePictureUrl: String
+  role: Role!
+  updatedAt: DateTime!
+  verificationToken: String
 }
