@@ -2,15 +2,24 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserService } from './user.service';
 import { UserController } from './user.controller';
-import { User } from 'src/user/user.entity';
+import { User } from 'src/user/entities/user.entity';
 import { UrlGeneratorService } from 'src/utils/pagination.util';
-import { FileUploadService } from 'src/integrations/s3/file-upload.service';
-import { Role } from './role.entity';
+import { PasswordHelper } from './password.helper';
+import { Role } from './entities/role.entity';
 import { RoleService } from './role.service';
+import { AuthController } from './auth.controller';
+import { FileUploadModule } from 'src/integrations/s3/file-upload.module';
+import { JwtModule } from 'src/utils/jwt.module';
+import { EmailModule } from 'src/integrations/sg/email.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User, Role])],
-  controllers: [UserController],
-  providers: [UserService, UrlGeneratorService, FileUploadService, RoleService],
+  imports: [
+    TypeOrmModule.forFeature([User, Role]),
+    FileUploadModule,
+    JwtModule,
+    EmailModule,
+  ],
+  controllers: [UserController, AuthController],
+  providers: [UserService, UrlGeneratorService, RoleService, PasswordHelper],
 })
 export class UserModule {}

@@ -291,5 +291,38 @@ remove that on module init instead write seeder for that role table
 
 
 Started conversion from rest to graphql
+But first work on current feedback
 
-Created a separate branch for graphql version and testing that now
+
+RxJs, observers concept revisit.
+scalability of code not for the application
+remove client  on slide, rename phases
+repository pattern and models
+moule access, service exports, benefits of importing whole module and then use the service after export.
+only repo can be injected in one service, call role service after oving findone to role service
+why we don't need to put get query in transaction.
+use of eager in custom bridge table.
+why to use middlewares if we put the authentication in guards
+Dependency injection in more details, seperate diagram
+parameter passed for service in constructor, where to declare vairable for initialization based on the parameter passed by a constructor. syntax
+what are dynamic modules.
+order in class validation, transform in validation, validation of id, create a separate dto
+use of response in applying DTO for validation
+set cookies in controller, modified the response and we should modify the response in inerceptor
+any data form request or response should be handeled in the interceptor, (in the pagination)
+move authorization to request level.
+handle fetch post on service level except from that put everything on request level
+how use ref manages the circular dependency.
+ mediator design pattern
+over fetching and under fetching
+
+
+
+From console logging in constructors get the basic flow of application
+and implement that interceptor concept and a decorator for getting the user all, not individual id or role etc.
+that response handling in interceptor means cookie setting
+
+
+modify element of some other module service, and access that somewhere else what will happen
+modify at separate place and access at separate place
+module initialization confirmed through constructor calls on startup they are initialized

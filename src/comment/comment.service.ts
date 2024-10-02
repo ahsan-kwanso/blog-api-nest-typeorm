@@ -6,18 +6,17 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Comment } from './comment.entity';
-import { Post } from 'src/post/post.entity';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';
 import { CommentData, CommentsResult } from 'src/comment/dto/comment';
+import { PostService } from 'src/post/post.service';
 
 @Injectable()
 export class CommentService {
   constructor(
     @InjectRepository(Comment)
     private readonly commentRepository: Repository<Comment>,
-    @InjectRepository(Post)
-    private readonly postRepository: Repository<Post>,
+    private readonly postService: PostService,
   ) {}
 
   private async getCommentDepth(commentId: number): Promise<number> {
@@ -76,12 +75,7 @@ export class CommentService {
     createCommentDto: CreateCommentDto,
     UserId: number,
   ): Promise<Comment> {
-    const post = await this.postRepository.findOne({
-      where: { id: createCommentDto.PostId },
-    });
-    if (!post) {
-      throw new NotFoundException('Post not found');
-    }
+    const post = await this.postService.findOne(createCommentDto.PostId);
 
     if (createCommentDto.ParentCommentId) {
       const parentComment = await this.commentRepository.findOne({
@@ -111,12 +105,7 @@ export class CommentService {
   }
 
   async findAllByPostId(postId: number): Promise<CommentsResult> {
-    const post = await this.postRepository.findOne({
-      where: { id: postId },
-    });
-    if (!post) {
-      throw new NotFoundException('Post not found');
-    }
+    const post = await this.postService.findOne(postId);
 
     const comments = await this.commentRepository.find({
       where: { PostId: postId },

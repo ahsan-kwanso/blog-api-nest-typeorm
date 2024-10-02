@@ -1,26 +1,41 @@
-import { Body, Controller, Post, Res, Get, Req } from '@nestjs/common';
-import { AuthService } from './auth.service';
+import {
+  Body,
+  Controller,
+  Post,
+  Res,
+  Get,
+  Req,
+  UseInterceptors,
+} from '@nestjs/common';
+import { UserService } from './user.service';
 import { LoginDto } from './dto/login.dto';
 import { SignupDto } from './dto/signup.dto';
 import { Response, Request as ExpressRequest } from 'express';
+import { Public } from 'src/common/public.decorator';
+import { SetAuthTokenInterceptor } from 'src/common/set-auth-token.interceptor';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(private readonly authService: UserService) {}
 
+  @Public()
   @Post('signup')
   async signup(@Body() signupDto: SignupDto): Promise<{ message: string }> {
     const message = await this.authService.signup(signupDto);
     return { message: message };
   }
 
+  @Public()
   @Post('signin')
-  async login(@Body() loginDto: LoginDto, @Res() res: Response): Promise<void> {
-    await this.authService.login(loginDto, res);
-    // no need to send token as it is stored in cookie
-    res.send({ message: 'Login successful' });
+  @UseInterceptors(SetAuthTokenInterceptor) // Apply the interceptor here for cookie setting
+  async login(
+    @Body() loginDto: LoginDto,
+  ): Promise<{ message: string; token: string }> {
+    const token = await this.authService.login(loginDto); // This should return the token
+    return { message: 'Login successful', token }; // Return token for interceptor to process
   }
 
+  @Public()
   @Post('verify-email')
   async verifyEmail(
     @Body('token') token: string,

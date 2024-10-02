@@ -1,120 +1,52 @@
 import {
   Injectable,
   NotFoundException,
-  ConflictException,
   ForbiddenException,
   InternalServerErrorException,
+  UnauthorizedException,
+  BadRequestException,
 } from '@nestjs/common';
-import { User } from 'src/user/user.entity';
-import { Role } from './role.entity';
-import { CreateUserDto } from './dto/create-user.dto';
+import { User } from './entities/user.entity';
+import { RoleService } from './role.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import {
-  PaginatedUserWithNumberOfPosts,
-  UserWithNumberOfPosts,
-} from 'src/user/dto/user';
+import { PaginatedUserWithNumberOfPosts } from 'src/user/dto/user';
+import { SignupDto } from './dto/signup.dto';
+import { LoginDto } from './dto/login.dto';
+import { Role as RoleEnum } from './dto/role.enum';
 import { Request as ExpressRequest } from 'express';
 import { UrlGeneratorService } from 'src/utils/pagination.util';
 import { Repository } from 'typeorm';
 import { FileUploadService } from 'src/integrations/s3/file-upload.service';
+import { EmailService } from 'src/integrations/sg/email.service';
+import { PasswordHelper } from './password.helper';
+import { JwtService } from 'src/utils/jwt.service';
+import * as crypto from 'crypto';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
-    @InjectRepository(Role)
-    private readonly roleRepository: Repository<Role>,
+    private readonly roleService: RoleService,
     private readonly urlGeneratorService: UrlGeneratorService,
     private readonly fileUploadService: FileUploadService,
+    private readonly emailService: EmailService,
+    private readonly passwordHelper: PasswordHelper,
+    private readonly jwtService: JwtService,
+    private readonly configService: ConfigService,
   ) {}
 
-  async create(createUserDto: Partial<CreateUserDto>): Promise<User> {
-    // Check if a user with the same email already exists
-    const existingUser = await this.userRepository.findOne({
-      where: { email: createUserDto.email },
-    });
-
-    if (existingUser) {
-      // If user exists, throw ConflictException
-      throw new ConflictException('A user with this email already exists');
-    }
-
-    const { roleId } = createUserDto;
-
-    let role: Role | null;
-
-    // Check if roleId is provided
-    if (roleId) {
-      role = await this.roleRepository.findOne({ where: { id: roleId } });
-      if (!role) {
-        throw new NotFoundException('Role not found');
-      }
-    } else {
-      // If no role specified, assign 'user' role by default
-      role = await this.roleRepository.findOne({ where: { name: 'user' } });
-      if (!role) {
-        throw new NotFoundException('Default user role not found');
-      }
-    }
-
-    const user = this.userRepository.create({
-      ...createUserDto,
-      role,
-    });
-
-    // Save the new user to the database
-    await this.userRepository.save(user);
-
-    const reloadedUser = await this.userRepository.findOne({
-      where: { id: user.id },
-      relations: ['role'],
-    });
-
-    if (!reloadedUser) {
-      throw new NotFoundException('User not found');
-    }
-
-    return reloadedUser;
-  }
-
-  //this is being used by controller so I will send number of posts embedded in here
-  async findAll(): Promise<UserWithNumberOfPosts[]> {
-    const users = await this.userRepository
-      .createQueryBuilder('user')
-      .leftJoinAndSelect('user.posts', 'post') // Join with posts
-      .select([
-        'user.id',
-        'user.name',
-        'user.email',
-        'user.role',
-        'COUNT(post.id) AS posts', // Count the number of posts
-      ])
-      .groupBy('user.id') // Group by user to aggregate post counts
-      .getRawMany(); // Get raw results
-
-    // Map the result to match the UserWithNumberOfPosts interface
-    return users.map((user) => ({
-      id: user.user_id,
-      name: user.user_name,
-      email: user.user_email,
-      role: user.user_role,
-      posts: Number(user.posts), // Cast the posts count to a number
-    }));
-  }
-
   async findAllPaginated(
-    req: ExpressRequest,
+    baseUrl: string,
+    queryParams: any,
     page: number,
     limit: number,
     role?: string,
     sortBy?: string,
     sortOrder?: 'asc' | 'desc',
   ): Promise<PaginatedUserWithNumberOfPosts> {
-    const pageSize = Number(limit);
-    const pageNumber = Number(page);
-
     // Construct order clause based on sortBy and sortOrder
     const order: { [key: string]: 'ASC' | 'DESC' } = {};
     if (sortBy) {
@@ -135,8 +67,8 @@ export class UserService {
       ])
       .groupBy('user.id') // Group by user ID
       .addGroupBy('role.name') // Group by role name
-      .offset((pageNumber - 1) * pageSize) // Offset for pagination
-      .limit(pageSize); // Limit the results
+      .offset((page - 1) * limit) // Offset for pagination
+      .limit(limit); // Limit the results
 
     if (role) {
       queryBuilder.andWhere('role.name = :role', { role }); // Corrected to access role name
@@ -169,22 +101,22 @@ export class UserService {
       posts: Number(user.postscount), // Cast posts count to a number
     }));
 
-    const totalPages = Math.ceil(totalCount / pageSize);
-    const nextPage = pageNumber < totalPages ? pageNumber + 1 : null;
+    const totalPages = Math.ceil(totalCount / limit);
+    const nextPage = page < totalPages ? page + 1 : null;
 
     return {
       users: userWithNumberOfPosts,
       total: totalCount,
-      page: pageNumber,
-      pageSize: pageSize,
-      nextPage: this.urlGeneratorService.generateNextPageUrl(
+      page: page,
+      pageSize: limit,
+      nextPage: this.urlGeneratorService.generateNextPageUrl2(
         nextPage,
-        pageSize,
-        req,
+        limit,
+        baseUrl,
+        queryParams,
       ),
     };
   }
-
   async findOne(id: number): Promise<User> {
     const user = await this.userRepository.findOne({
       where: { id },
@@ -217,13 +149,8 @@ export class UserService {
 
     // Update user properties with the DTO values
     if (updateUserDto.RoleId) {
-      const role = await this.roleRepository.findOne({
-        where: { id: updateUserDto.RoleId },
-      });
-      if (!role) {
-        throw new NotFoundException('Role not found');
-      }
-      user.role = role; // Assign the Role entity instead of just setting RoleId
+      const role = await this.roleService.findRoleById(updateUserDto.RoleId); // Use the new RoleService method
+      user.role = role; // Assign the Role entity
     }
 
     // Save the updated user
@@ -279,6 +206,119 @@ export class UserService {
       return user;
     } catch (error) {
       throw new InternalServerErrorException('Error uploading profile picture');
+    }
+  }
+
+  async signup(signupDto: SignupDto): Promise<string> {
+    const verificationToken = crypto.randomBytes(32).toString('hex'); // Generate a 6-character code
+
+    const existingUser = await this.userRepository.findOneBy({
+      email: signupDto.email,
+    });
+    if (existingUser) {
+      throw new UnauthorizedException('User already exists');
+    }
+    const user = this.userRepository.create({
+      ...signupDto,
+      isVerified: false, // User is not verified yet
+      verificationToken, // Store the verification code
+      //RoleId: 1, // by default user
+    });
+    // Send the verification code to the user's email
+    const verificationLink = `${this.configService.get('APP_URL')}/verify-email?token=${verificationToken}`;
+    await this.emailService.sendVerificationEmail(
+      signupDto.email,
+      verificationLink,
+    );
+    await this.userRepository.save(user);
+
+    // Return a message to the user indicating that they need to verify their email
+    return 'A verification link has been sent to your email. Please verify your account.';
+  }
+
+  async verifyEmail(token: string): Promise<User | null> {
+    const user = await this.userRepository.findOne({
+      where: { verificationToken: token },
+    });
+
+    if (!user) {
+      throw new BadRequestException('Invalid verification token.');
+    }
+
+    if (user.isVerified) {
+      throw new BadRequestException('User is already verified.');
+    }
+    if (user.verificationToken === token) {
+      user.isVerified = true;
+      user.verificationToken = '';
+      await this.userRepository.save(user);
+      return user;
+    }
+    return null;
+  }
+
+  async login(loginDto: LoginDto): Promise<string> {
+    const user = await this.userRepository.findOne({
+      where: { email: loginDto.email },
+      select: [
+        'id',
+        'name',
+        'email',
+        'password',
+        'role',
+        'isVerified',
+        'verificationToken',
+      ],
+      relations: ['role'],
+    });
+
+    if (
+      !user ||
+      !(await this.passwordHelper.validatePassword(
+        loginDto.password,
+        user.password,
+      ))
+    ) {
+      throw new UnauthorizedException('Invalid credentials');
+    }
+
+    if (user && !user.isVerified) {
+      const verificationToken = user.verificationToken;
+      const verificationLink = `${this.configService.get('APP_URL')}/verify-email?token=${verificationToken}`;
+      await this.emailService.sendVerificationEmail(
+        user.email,
+        verificationLink,
+      );
+
+      throw new UnauthorizedException(
+        'Email not verified. A verification link has been sent to your email.',
+      );
+    }
+
+    const role: RoleEnum = user.role.name as RoleEnum;
+    const token = this.jwtService.generateToken({
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      role: role,
+    });
+
+    // Return the token without setting the cookie
+    return token;
+  }
+
+  validateToken(req: ExpressRequest) {
+    const token = req.cookies['auth_token']; // Get the token from the cookie
+
+    if (!token) {
+      throw new UnauthorizedException('No token provided');
+    }
+
+    try {
+      const decoded = this.jwtService.verifyToken(token); // Verify the token
+      return decoded; // Return the decoded token if valid
+    } catch (error) {
+      throw new UnauthorizedException('Invalid token');
     }
   }
 }

@@ -1,17 +1,8 @@
-import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
-  OneToMany,
-  CreateDateColumn,
-  UpdateDateColumn,
-  ManyToOne,
-  JoinColumn,
-} from 'typeorm';
-import { Post } from '../post/post.entity';
-import { Comment } from '../comment/comment.entity';
+import { Entity, Column, OneToMany, ManyToOne, JoinColumn } from 'typeorm';
+import { Post } from '../../post/post.entity';
+import { Comment } from '../../comment/comment.entity';
 import { Role } from './role.entity';
-import { BaseEntity } from '../common/base.entity';
+import { BaseEntity } from '../../common/base.entity';
 
 // separate table for role
 
@@ -29,8 +20,8 @@ export class User extends BaseEntity {
   @Column({ type: 'int', nullable: false, default: 1 })
   RoleId: number;
 
-  // add a foreign key reference to the Role table, see many to many
-  @ManyToOne(() => Role, { eager: true })
+  // add a foreign key reference to the Role table, see many to many // currently set eager to true as per frontend requirements in current version
+  @ManyToOne(() => Role, { eager: true }) //  { eager: true } not needed, now in responses no role is specified
   @JoinColumn({ name: 'RoleId' }) // Links to role table
   role: Role;
 

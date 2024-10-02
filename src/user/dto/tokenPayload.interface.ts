@@ -1,4 +1,4 @@
-import { Role } from '../../dto/role.enum';
+import { Role } from './role.enum';
 
 export interface TokenPayload {
   id: number;

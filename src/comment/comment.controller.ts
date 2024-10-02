@@ -5,7 +5,6 @@ import {
   Delete,
   Param,
   Body,
-  Req,
   ParseIntPipe,
   Put,
 } from '@nestjs/common';
@@ -13,7 +12,6 @@ import { CommentService } from './comment.service';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';
 import { Comment } from 'src/comment/comment.entity';
-import { Request } from 'express';
 import { CommentsResult } from 'src/comment/dto/comment';
 import { LoggedInUserId } from 'src/common/LoggedInUserId.decorator';
 

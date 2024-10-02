@@ -16,7 +16,6 @@ import {
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { UserService } from './user.service';
-import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PaginationQueryDto } from '../common/pagination.dto';
 import { Request as ExpressRequest } from 'express';
@@ -24,6 +23,7 @@ import { Roles } from '../common/roles.decorator';
 import { Role } from 'src/user/dto/role.enum';
 import { RolesGuard } from '../common/roles.guard';
 import { LoggedInUserId } from 'src/common/LoggedInUserId.decorator';
+import { UrlExtractionInterceptor } from 'src/common/url.interceptor';
 
 const MAX_FILE_SIZE_MB = 10;
 const ALLOWED_MIME_TYPES = [
@@ -55,28 +55,22 @@ const limits = {
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @Post()
-  async create(@Body() createUserDto: CreateUserDto) {
-    return await this.userService.create(createUserDto);
-  }
-
-  @Get('/v1')
-  @UseGuards(RolesGuard)
-  @Roles(Role.ADMIN)
-  async findAll() {
-    return await this.userService.findAll();
-  }
-
   @Get()
   @UseGuards(RolesGuard)
   @Roles(Role.ADMIN)
+  @UseInterceptors(UrlExtractionInterceptor)
   async findAllPag(
     @Req() req: ExpressRequest,
     @Query() paginationQuery?: PaginationQueryDto,
   ) {
     const { page, limit, sortBy, sortOrder, role } = paginationQuery || {};
+    const { baseUrl, queryParams } = req.urlData || {
+      baseUrl: '',
+      queryParams: {},
+    };
     return await this.userService.findAllPaginated(
-      req,
+      baseUrl,
+      queryParams,
       page!,
       limit!,
       role,
