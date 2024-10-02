@@ -37,9 +37,30 @@ type Message {
 
 type Mutation {
   login(loginDto: LoginDto!): LoginResponse!
+  remove(id: Int!): Message!
   signout: Message!
   signup(signupDto: SignupDto!): Message!
+  update(id: Int!, updateUserDto: UpdateUserDto!): User!
   verifyEmail(token: String!): Message!
+}
+
+type PaginatedUserWithNumberOfPosts {
+  nextPage: String
+  page: Float
+  pageSize: Float
+  total: Int!
+  users: [UserWithNumberOfPosts!]!
+}
+
+input PaginationQueryDto {
+  filter: String
+  limit: Float! = 2
+  page: Float! = 1
+  role: String
+  sortBy: String
+  sortOrder: String
+  title: String
+  userId: Float
 }
 
 type Post {
@@ -55,6 +76,9 @@ type Post {
 
 type Query {
   checkAuth: Message!
+  currentUser: User!
+  findAllPaginated(pagination: PaginationQueryDto!): PaginatedUserWithNumberOfPosts!
+  findOne(id: Int!): User!
   getHello: String!
 }
 
@@ -70,6 +94,13 @@ input SignupDto {
   password: String!
 }
 
+input UpdateUserDto {
+  RoleId: Float
+  email: String
+  name: String
+  password: String
+}
+
 type User {
   RoleId: Int!
   comments: [Comment!]!
@@ -83,4 +114,12 @@ type User {
   role: Role!
   updatedAt: DateTime!
   verificationToken: String
+}
+
+type UserWithNumberOfPosts {
+  email: String!
+  id: Int!
+  name: String!
+  posts: Int!
+  role: String!
 }

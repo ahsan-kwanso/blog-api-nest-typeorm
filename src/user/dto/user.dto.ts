@@ -33,5 +33,5 @@ export class PaginatedUserWithNumberOfPosts {
   pageSize?: number;
 
   @Field({ nullable: true }) // Make nextPage optional
-  nextPage: string | null;
+  nextPage?: string;
 }

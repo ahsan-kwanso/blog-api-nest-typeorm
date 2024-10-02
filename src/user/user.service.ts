@@ -10,7 +10,7 @@ import { User } from './entities/user.entity';
 import { RoleService } from './role.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { PaginatedUserWithNumberOfPosts } from 'src/user/dto/user';
+import { PaginatedUserWithNumberOfPosts } from 'src/user/dto/user.dto';
 import { SignupDto } from './dto/signup.dto';
 import { LoginDto } from './dto/login.dto';
 import { Role as RoleEnum } from './dto/role.enum';
@@ -109,12 +109,13 @@ export class UserService {
       total: totalCount,
       page: page,
       pageSize: limit,
-      nextPage: this.urlGeneratorService.generateNextPageUrl2(
-        nextPage,
-        limit,
-        baseUrl,
-        queryParams,
-      ),
+      nextPage:
+        this.urlGeneratorService.generateNextPageUrl2(
+          nextPage,
+          limit,
+          baseUrl,
+          queryParams,
+        ) || '',
     };
   }
   async findOne(id: number): Promise<User> {

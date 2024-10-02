@@ -12,6 +12,7 @@ import { FileUploadModule } from 'src/integrations/s3/file-upload.module';
 import { JwtModule } from 'src/utils/jwt.module';
 import { EmailModule } from 'src/integrations/sg/email.module';
 import { AuthResolver } from './auth.resolver';
+import { UserResolver } from './user.resolver';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { AuthResolver } from './auth.resolver';
     RoleService,
     PasswordHelper,
     AuthResolver,
+    UserResolver,
   ],
 })
 export class UserModule {}
