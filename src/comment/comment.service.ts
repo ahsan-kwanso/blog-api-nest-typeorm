@@ -10,7 +10,6 @@ import { CreateCommentDto } from './dto/create-comment.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';
 import { CommentData, CommentsResult } from 'src/comment/dto/comment';
 import { PostService } from 'src/post/post.service';
-import { EmailService } from 'src/integrations/sg/email.service';
 
 @Injectable()
 export class CommentService {
@@ -18,11 +17,7 @@ export class CommentService {
     @InjectRepository(Comment)
     private readonly commentRepository: Repository<Comment>,
     private readonly postService: PostService,
-    private readonly emailService: EmailService,
-  ) {
-    console.log('Comment Service Constructor');
-    console.log(emailService.test);
-  }
+  ) {}
 
   private async getCommentDepth(commentId: number): Promise<number> {
     let depth = 0;
@@ -80,7 +75,6 @@ export class CommentService {
     createCommentDto: CreateCommentDto,
     UserId: number,
   ): Promise<Comment> {
-    console.log(this.emailService.test);
     const post = await this.postService.findOne(createCommentDto.PostId);
 
     if (createCommentDto.ParentCommentId) {

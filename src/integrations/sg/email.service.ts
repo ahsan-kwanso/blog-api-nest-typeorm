@@ -5,7 +5,6 @@ import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class EmailService {
-  test: number = 10;
   constructor(private configService: ConfigService) {
     sgMail.setApiKey(this.configService.get<string>('SENDGRID_API_KEY')!);
   }

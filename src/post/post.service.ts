@@ -22,9 +22,7 @@ export class PostService {
     @InjectRepository(Post)
     private readonly postRepository: Repository<Post>,
     private readonly urlGeneratorService: UrlGeneratorService,
-  ) {
-    console.log('Post Service Constructor');
-  }
+  ) {}
 
   async create(createPostDto: CreatePostDto, UserId: number): Promise<Post> {
     try {

@@ -6,7 +6,6 @@ import {
   UnauthorizedException,
   BadRequestException,
 } from '@nestjs/common';
-import { Response } from 'express';
 import { User } from './entities/user.entity';
 import { RoleService } from './role.service';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -37,10 +36,7 @@ export class UserService {
     private readonly passwordHelper: PasswordHelper,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
-  ) {
-    emailService.test = 20;
-    console.log(emailService.test);
-  }
+  ) {}
 
   async findAllPaginated(
     baseUrl: string,
