@@ -17,7 +17,7 @@ export class ConditionalAuthGuard implements CanActivate {
     //console.log(request.body.query);
     const filter = gqlContext.getArgs().paginationQuery.filter;
     //const filter = request.query['filter']; // Check for the filter query parameter
-    console.log(filter);
+    // console.log(filter);
     // If 'filter' is 'my-posts', enforce authentication
     if (filter === 'my-posts') {
       const token = request.cookies['auth_token'];

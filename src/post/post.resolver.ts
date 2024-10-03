@@ -45,15 +45,10 @@ export class PostResolver {
     @Context('req') req: GraphQLRequestContext,
   ): Promise<PaginatedPostsResponse> {
     const { page, limit, filter, userId } = paginationQuery;
-    const queryParams = {
-      page: page,
-      limit: limit,
-      filter: filter,
-      userId: userId,
+    const { baseUrl, queryParams, currUserId } = req.urlData || {
+      baseUrl: '',
+      queryParams: {},
     };
-
-    const baseUrl = req.urlData?.baseUrl || '';
-    const currUserId = req.urlData?.currUserId;
     return await this.postService.getPosts(
       page,
       limit,
@@ -71,22 +66,16 @@ export class PostResolver {
   @UseInterceptors(UrlExtractionInterceptor)
   @Query(() => PaginatedPostsResponse)
   async searchPosts(
-    @Args('title', { type: () => String }) title: string,
     @Args('paginationQuery') paginationQuery: PaginationQueryDto,
     @Context('req') req: GraphQLRequestContext,
   ): Promise<PaginatedPostsResponse> {
-    const { page, limit, filter, userId } = paginationQuery;
-    const queryParams = {
-      page: page,
-      limit: limit,
-      filter: filter,
-      userId: userId,
+    const { title, page, limit, filter, userId } = paginationQuery;
+    const { baseUrl, queryParams, currUserId } = req.urlData || {
+      baseUrl: '',
+      queryParams: {},
     };
-
-    const baseUrl = req.urlData?.baseUrl || '';
-    const currUserId = req.urlData?.currUserId;
     return await this.postService.searchPosts(
-      title,
+      title ?? '',
       page,
       limit,
       filter,

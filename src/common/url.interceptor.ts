@@ -11,6 +11,7 @@ import { Observable } from 'rxjs';
 export class UrlExtractionInterceptor implements NestInterceptor {
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     // Use GqlExecutionContext to extract the request from GraphQL context
+    const gqlContext = GqlExecutionContext.create(context);
     const ctx = GqlExecutionContext.create(context).getContext();
     const request = ctx.req;
 
@@ -18,7 +19,7 @@ export class UrlExtractionInterceptor implements NestInterceptor {
     const protocol = request.protocol;
     const host = request.get('host');
     const baseUrl = `${protocol}://${host}${request.originalUrl.split('?')[0]}`;
-    const queryParams = request.query;
+    const queryParams = gqlContext.getArgs().paginationQuery;
     const currUserId = request.user ? request.user.id : null; // Handle case when user is not authenticated
 
     // Attach the extracted data to the request object

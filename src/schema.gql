@@ -151,7 +151,7 @@ type Query {
   getHello: String!
   getPost(id: Int!): Post
   getPosts(paginationQuery: PaginationQueryDto!): PaginatedPostsResponse!
-  searchPosts(paginationQuery: PaginationQueryDto!, title: String!): PaginatedPostsResponse!
+  searchPosts(paginationQuery: PaginationQueryDto!): PaginatedPostsResponse!
 }
 
 type Role {
