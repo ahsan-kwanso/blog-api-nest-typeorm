@@ -19,7 +19,7 @@ import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { join } from 'path'; // Needed for schema file path
 import { AppResolver } from './app.service';
 import { Request, Response } from 'express'; // Import Express types
-
+import { graphqlUploadExpress } from 'graphql-upload-minimal';
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }), // validation for config
@@ -57,6 +57,11 @@ import { Request, Response } from 'express'; // Import Express types
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(LoggingMiddleware).forRoutes('*');
+    consumer
+      .apply(
+        LoggingMiddleware,
+        graphqlUploadExpress({ maxFileSize: 10 * 1024 * 1024, maxFiles: 1 }), // now rest file upload will not work
+      )
+      .forRoutes('*');
   }
 }

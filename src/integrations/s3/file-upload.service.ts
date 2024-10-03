@@ -49,6 +49,31 @@ export class FileUploadService {
       throw new InternalServerErrorException('Error uploading file to S3');
     }
   }
+
+  async uploadFileGql(file: {
+    buffer: Buffer;
+    originalname: string;
+    mimetype: string;
+  }): Promise<string> {
+    const fileName = `${uuidv4()}-${file.originalname}`;
+    const fileKey = `profile-pictures/${fileName}`;
+    try {
+      // Upload file to S3
+      await this.s3Client.send(
+        new PutObjectCommand({
+          Bucket: this.s3BucketName,
+          Key: fileKey,
+          Body: file.buffer,
+          ContentType: file.mimetype,
+        }),
+      );
+      // Return file key for further use
+      return fileKey;
+    } catch (error) {
+      throw new InternalServerErrorException('Error uploading file to S3');
+    }
+  }
+
   async getSignedUrlS(fileKey: string): Promise<string> {
     try {
       // Generate signed URL with expiration time

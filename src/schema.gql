@@ -90,6 +90,7 @@ type Mutation {
   update(id: Int!, updateUserDto: UpdateUserDto!): User!
   updateComment(id: Int!, updateCommentDto: UpdateCommentDto!): Message!
   updatePost(id: Int!, updatePostDto: UpdatePostDto!): Message!
+  uploadProfilePicture(file: Upload!, userId: Float!): User!
   verifyEmail(token: String!): Message!
 }
 
@@ -188,6 +189,9 @@ input UpdateUserDto {
   name: String
   password: String
 }
+
+"""The `Upload` scalar type represents a file upload."""
+scalar Upload
 
 type User {
   RoleId: Int!

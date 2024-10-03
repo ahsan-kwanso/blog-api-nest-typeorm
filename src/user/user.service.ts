@@ -23,6 +23,17 @@ import { PasswordHelper } from './password.helper';
 import { JwtService } from 'src/utils/jwt.service';
 import * as crypto from 'crypto';
 import { ConfigService } from '@nestjs/config';
+import { FileUpload } from 'graphql-upload-minimal';
+import { Readable } from 'stream';
+
+async function streamToBuffer(stream: Readable): Promise<Buffer> {
+  return new Promise((resolve, reject) => {
+    const chunks: Buffer[] = [];
+    stream.on('data', (chunk) => chunks.push(Buffer.from(chunk)));
+    stream.on('error', reject);
+    stream.on('end', () => resolve(Buffer.concat(chunks)));
+  });
+}
 
 @Injectable()
 export class UserService {
@@ -198,6 +209,46 @@ export class UserService {
     try {
       // Use FileUploadService to upload file and get the file key
       const fileKey = await this.fileUploadService.uploadFile(file);
+
+      // Get signed URL
+      const signedUrl = await this.fileUploadService.getSignedUrlS(fileKey);
+      user.profilePictureUrl = signedUrl;
+      await this.userRepository.save(user);
+
+      return user;
+    } catch (error) {
+      throw new InternalServerErrorException('Error uploading profile picture');
+    }
+  }
+
+  async uploadProfilePicture2(
+    userId: number,
+    file: FileUpload,
+    loggedInUserId: number,
+  ): Promise<User> {
+    if (userId !== loggedInUserId) {
+      throw new ForbiddenException('You are not authenticated.');
+    }
+
+    const user = await this.userRepository.findOne({
+      where: { id: userId },
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    try {
+      // Convert the FileUpload stream to a buffer
+      const { createReadStream, filename, mimetype } = file;
+      const fileBuffer = await streamToBuffer(createReadStream());
+
+      // Use FileUploadService to upload file and get the file key
+      const fileKey = await this.fileUploadService.uploadFileGql({
+        buffer: fileBuffer,
+        originalname: filename,
+        mimetype: mimetype,
+      });
 
       // Get signed URL
       const signedUrl = await this.fileUploadService.getSignedUrlS(fileKey);

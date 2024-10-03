@@ -5,13 +5,24 @@ import { PaginationQueryDto } from '../common/pagination.dto';
 import { User } from './entities/user.entity'; // Assume you have a User entity defined
 import { Roles } from '../common/roles.decorator';
 import { Role } from 'src/user/dto/role.enum';
-import { UseGuards, UseInterceptors } from '@nestjs/common';
+import {
+  UseGuards,
+  UseInterceptors,
+  BadRequestException,
+} from '@nestjs/common';
 import { RolesGuard } from '../common/roles.guard';
 import { LoggedInUserId } from 'src/common/LoggedInUserId.decorator';
 import { Message } from '../common/message.dto';
 import { PaginatedUserWithNumberOfPosts } from './dto/user.dto';
 import { UrlExtractionInterceptor } from 'src/common/url.interceptor';
-//   import { FileUpload, GraphQLUpload } from 'graphql-upload/Upload.mjs';
+import { GraphQLUpload, FileUpload } from 'graphql-upload-minimal';
+
+const ALLOWED_MIME_TYPES = [
+  'image/jpeg',
+  'image/png',
+  'image/gif',
+  'image/jpg',
+];
 
 interface GraphQLRequestContext {
   urlData?: {
@@ -86,17 +97,23 @@ export class UserResolver {
     return { message: 'User Deleted' };
   }
 
-  //   @Mutation(() => User)
-  //   async uploadProfilePicture(
-  //     @Args('id', { type: () => Int }) userId: number,
-  //     @Args({ name: 'file', type: () => GraphQLUpload }) file: FileUpload,
-  //     @LoggedInUserId() loggedInUserId: number,
-  //   ) {
-  //     const user = await this.userService.uploadProfilePicture(
-  //       userId,
-  //       file,
-  //       loggedInUserId,
-  //     );
-  //     return user;
-  //   }
+  @Mutation(() => User)
+  async uploadProfilePicture(
+    @Args('userId', { type: () => Number }) userId: number,
+    @Args({ name: 'file', type: () => GraphQLUpload }) file: FileUpload,
+    @LoggedInUserId() loggedInUserId: number, // Use this if you need to access the request for loggedInUserId
+  ): Promise<User> {
+    if (!ALLOWED_MIME_TYPES.includes(file.mimetype)) {
+      throw new BadRequestException(
+        'Invalid file type. Only jpg and png images are allowed.',
+      );
+    }
+    // Upload the profile picture
+    const user = await this.userService.uploadProfilePicture2(
+      userId,
+      file,
+      loggedInUserId,
+    );
+    return user;
+  }
 }
