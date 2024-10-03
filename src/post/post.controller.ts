@@ -18,7 +18,7 @@ import { PostService } from './post.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { Post as PostModel } from 'src/post/post.entity';
-import { PaginatedPostsResponse } from './dto/post';
+import { PaginatedPostsResponse } from './dto/post.dto';
 import { LoggedInUserId } from 'src/common/LoggedInUserId.decorator';
 import { LoggedInUserRole } from 'src/common/LoggedInUserRole.decorator';
 import { Role } from 'src/user/dto/role.enum';
@@ -52,6 +52,7 @@ export class PostController {
       baseUrl: '',
       queryParams: {},
     };
+    console.log('In controller', currUserId);
     return await this.postService.getPosts(
       page,
       limit,

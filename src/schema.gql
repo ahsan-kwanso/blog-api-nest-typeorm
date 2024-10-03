@@ -53,6 +53,12 @@ input CreateCommentDto {
   content: String!
 }
 
+input CreatePostDto {
+  UserId: Int
+  content: String!
+  title: String!
+}
+
 """
 A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
 """
@@ -74,6 +80,8 @@ type Message {
 
 type Mutation {
   createComment(createCommentDto: CreateCommentDto!): Message!
+  createPost(createPostDto: CreatePostDto!): Message!
+  deletePost(id: Int!): Message!
   login(loginDto: LoginDto!): LoginResponse!
   remove(id: Int!): Message!
   removeComment(id: Int!): Message!
@@ -81,7 +89,17 @@ type Mutation {
   signup(signupDto: SignupDto!): Message!
   update(id: Int!, updateUserDto: UpdateUserDto!): User!
   updateComment(id: Int!, updateCommentDto: UpdateCommentDto!): Message!
+  updatePost(id: Int!, updatePostDto: UpdatePostDto!): Message!
   verifyEmail(token: String!): Message!
+}
+
+type PaginatedPostsResponse {
+  nextPage: String
+  page: Int
+  pageSize: Int
+  posts: [PostResponse!]!
+  success: Boolean
+  total: Int!
 }
 
 type PaginatedUserWithNumberOfPosts {
@@ -114,6 +132,14 @@ type Post {
   user: User!
 }
 
+type PostResponse {
+  author: String
+  content: String!
+  date: DateTime!
+  id: Int!
+  title: String!
+}
+
 type Query {
   checkAuth: Message!
   currentUser: User!
@@ -123,6 +149,9 @@ type Query {
   findOne(id: Int!): User!
   findOneComment(id: Int!): Comment!
   getHello: String!
+  getPost(id: Int!): Post
+  getPosts(paginationQuery: PaginationQueryDto!): PaginatedPostsResponse!
+  searchPosts(paginationQuery: PaginationQueryDto!, title: String!): PaginatedPostsResponse!
 }
 
 type Role {
@@ -146,6 +175,11 @@ input UpdateCommentDto {
 
   """Content of the comment"""
   content: String
+}
+
+input UpdatePostDto {
+  content: String
+  title: String
 }
 
 input UpdateUserDto {

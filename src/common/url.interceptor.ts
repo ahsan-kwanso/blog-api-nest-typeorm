@@ -19,8 +19,6 @@ export class UrlExtractionInterceptor implements NestInterceptor {
     const host = request.get('host');
     const baseUrl = `${protocol}://${host}${request.originalUrl.split('?')[0]}`;
     const queryParams = request.query;
-
-    // Extract user ID from request
     const currUserId = request.user ? request.user.id : null; // Handle case when user is not authenticated
 
     // Attach the extracted data to the request object

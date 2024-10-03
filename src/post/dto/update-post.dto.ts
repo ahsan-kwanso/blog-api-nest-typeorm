@@ -1,6 +1,9 @@
+import { InputType, Field } from '@nestjs/graphql';
 import { IsString, IsOptional, IsNotEmpty, Length } from 'class-validator';
 
+@InputType()
 export class UpdatePostDto {
+  @Field({ nullable: true })
   @IsString()
   @IsOptional()
   @IsNotEmpty({ message: 'Title is required' })
@@ -9,6 +12,7 @@ export class UpdatePostDto {
   })
   readonly title?: string;
 
+  @Field({ nullable: true })
   @IsString()
   @IsOptional()
   @IsNotEmpty({ message: 'Content is required' })

@@ -4,17 +4,15 @@ import {
   ConflictException,
   ForbiddenException,
 } from '@nestjs/common';
-import { Request as ExpressRequest } from 'express';
 import { Post } from 'src/post/post.entity';
 import { UrlGeneratorService } from 'src/utils/pagination.util';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
-import { PaginatedPostsResponse, PostResponse } from './dto/post';
+import { PaginatedPostsResponse, PostResponse } from './dto/post.dto';
 import paginationConfig from 'src/utils/pagination.config';
 import { Role } from 'src/user/dto/role.enum';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, SelectQueryBuilder } from 'typeorm';
-import { PaginationQueryDto } from 'src/common/pagination.dto';
 
 @Injectable()
 export class PostService {

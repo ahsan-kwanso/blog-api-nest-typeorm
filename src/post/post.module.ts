@@ -5,10 +5,11 @@ import { PostService } from './post.service';
 import { PostController } from './post.controller';
 import { UrlGeneratorService } from 'src/utils/pagination.util';
 import { JwtModule } from 'src/utils/jwt.module';
+import { PostResolver } from './post.resolver';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Post]), JwtModule],
-  providers: [PostService, UrlGeneratorService],
+  providers: [PostService, UrlGeneratorService, PostResolver],
   controllers: [PostController],
   exports: [PostService],
 })
