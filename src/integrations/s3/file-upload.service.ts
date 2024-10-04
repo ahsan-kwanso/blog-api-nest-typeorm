@@ -1,5 +1,8 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
+import {
+  Injectable,
+  InternalServerErrorException,
+  Inject,
+} from '@nestjs/common';
 import {
   S3Client,
   PutObjectCommand,
@@ -13,22 +16,14 @@ export class FileUploadService {
   private s3Client: S3Client;
   private s3BucketName: string;
 
-  constructor(private readonly configService: ConfigService) {
-    // Initialize S3 client with credentials and region
-    this.s3Client = new S3Client({
-      region: this.configService.get<string>('AWS_REGION'),
-      credentials: {
-        accessKeyId: this.configService.get<string>('AWS_ACCESS_KEY_ID')!,
-        secretAccessKey: this.configService.get<string>(
-          'AWS_SECRET_ACCESS_KEY',
-        )!,
-      },
-    });
-
-    // Fetch bucket name from environment
-    this.s3BucketName = this.configService.get<string>('AWS_S3_BUCKET_NAME')!;
+  // Inject S3 configuration using the 'S3_CONFIG' token
+  constructor(
+    @Inject('S3_CONFIG')
+    private readonly s3Config: { s3Client: S3Client; bucketName: string },
+  ) {
+    this.s3Client = this.s3Config.s3Client;
+    this.s3BucketName = this.s3Config.bucketName;
   }
-
   // Method to upload file to S3
   async uploadFile(file: Express.Multer.File): Promise<string> {
     const fileName = `${uuidv4()}-${file.originalname}`;
