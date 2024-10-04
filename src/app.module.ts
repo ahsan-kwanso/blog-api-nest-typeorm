@@ -31,6 +31,7 @@ import { graphqlUploadExpress } from 'graphql-upload-minimal';
     // Adding GraphQL Module
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
+      introspection: true,
       autoSchemaFile: join(process.cwd(), 'src/schema.gql'), // Automatically generates schema.gql
       sortSchema: true, // Sorts the schema output
       context: ({ req, res }: { req: Request; res: Response }) => ({
@@ -48,11 +49,6 @@ import { graphqlUploadExpress } from 'graphql-upload-minimal';
       provide: APP_GUARD,
       useClass: RolesGuard,
     },
-    {
-      provide: APP_PIPE,
-      useClass: ValidationPipe,
-    },
-    AppResolver,
   ],
 })
 export class AppModule implements NestModule {
@@ -60,7 +56,8 @@ export class AppModule implements NestModule {
     consumer
       .apply(
         LoggingMiddleware,
-        graphqlUploadExpress({ maxFileSize: 10 * 1024 * 1024, maxFiles: 1 }), // now rest file upload will not work
+        //graphqlUploadExpress({ maxFileSize: 10 * 1024 * 1024, maxFiles: 1 }), // now rest file upload will not work
+        //for graphql upload uncomment above section, for rest upload it is fine, we will be using rest file upload as graphql file upload is not so mature yet
       )
       .forRoutes('*');
   }
