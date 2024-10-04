@@ -52,7 +52,6 @@ export class PostController {
       baseUrl: '',
       queryParams: {},
     };
-    console.log('In controller', currUserId);
     return await this.postService.getPosts(
       page,
       limit,
