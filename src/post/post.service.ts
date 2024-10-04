@@ -13,6 +13,7 @@ import paginationConfig from 'src/utils/pagination.config';
 import { Role } from 'src/user/dto/role.enum';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, SelectQueryBuilder } from 'typeorm';
+import { FindManyOptions, ILike } from 'typeorm';
 
 @Injectable()
 export class PostService {
@@ -60,19 +61,19 @@ export class PostService {
     }
 
     // Define userId based on the filter
-    const postUserId = filter === 'my-posts' ? currUserId : null;
+    const postUserId = filter === 'my-posts' ? currUserId : undefined;
 
-    // Fetch posts based on userId
-    const [posts, total] = await this.postRepository
-      .createQueryBuilder('post')
-      .leftJoinAndSelect('post.user', 'user')
-      .where(postUserId ? 'post.UserId = :userId' : '1=1', {
-        userId: postUserId,
-      })
-      .orderBy('post.createdAt', 'DESC')
-      .limit(limit)
-      .offset((page - 1) * limit)
-      .getManyAndCount();
+    // Create query options
+    const whereCondition = postUserId ? { user: { id: postUserId } } : {};
+
+    // Fetch posts using repository's findAndCount method
+    const [posts, total] = await this.postRepository.findAndCount({
+      where: whereCondition,
+      relations: ['user'],
+      order: { createdAt: 'DESC' },
+      skip: (page - 1) * limit,
+      take: limit,
+    });
 
     // Format posts
     const formattedPosts: PostResponse[] = posts.map((post) => ({
@@ -111,13 +112,18 @@ export class PostService {
     baseUrl?: string, // Pass base URL for URL generation
     currUserId?: number,
   ): Promise<PaginatedPostsResponse> {
-    const pageSize = Number(limit);
-    const pageNumber = Number(page);
-
-    const queryBuilder: SelectQueryBuilder<Post> = this.postRepository
-      .createQueryBuilder('post')
-      .leftJoinAndSelect('post.user', 'user')
-      .where('post.title ILIKE :title', { title: `%${title}%` });
+    // Define the query options
+    const options: FindManyOptions<Post> = {
+      where: {
+        title: ILike(`%${title}%`),
+      },
+      relations: ['user'], // Include the user relation
+      take: limit,
+      skip: (page - 1) * limit,
+      order: {
+        createdAt: 'DESC',
+      },
+    };
 
     // Handle 'my-posts' filter
     if (filter === 'my-posts') {
@@ -128,16 +134,13 @@ export class PostService {
       if (userId !== currUserId) {
         throw new ForbiddenException('You do not have permissions');
       }
-      queryBuilder.andWhere('post.UserId = :userId', { userId });
+      options.where = {
+        ...options.where,
+        UserId: userId, // Filter by userId
+      };
     }
 
-    // Apply pagination and sorting
-    queryBuilder
-      .take(pageSize)
-      .skip((pageNumber - 1) * pageSize)
-      .orderBy('post.createdAt', 'DESC');
-
-    const [posts, total] = await queryBuilder.getManyAndCount();
+    const [posts, total] = await this.postRepository.findAndCount(options);
 
     const formattedPosts = posts.map((post) => ({
       id: post.id,
@@ -147,17 +150,17 @@ export class PostService {
       date: post.updatedAt,
     }));
 
-    const totalPages = Math.ceil(total / pageSize);
-    const nextPage = pageNumber < totalPages ? pageNumber + 1 : null;
+    const totalPages = Math.ceil(total / limit);
+    const nextPage = page < totalPages ? page + 1 : null;
 
     return {
       posts: formattedPosts,
       total,
-      page: pageNumber,
-      pageSize: pageSize,
+      page: page,
+      pageSize: limit,
       nextPage: this.urlGeneratorService.generateNextPageUrl2(
         nextPage,
-        pageSize,
+        limit,
         baseUrl!,
         queryParams,
       ),
