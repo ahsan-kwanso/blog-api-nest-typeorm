@@ -13,6 +13,7 @@ import { JwtModule } from 'src/utils/jwt.module';
 import { EmailModule } from 'src/integrations/sg/email.module';
 import { AuthResolver } from './auth.resolver';
 import { UserResolver } from './user.resolver';
+import { UserSubscriber } from './user.subscriber';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { UserResolver } from './user.resolver';
     PasswordHelper,
     AuthResolver,
     UserResolver,
+    UserSubscriber,
   ],
 })
 export class UserModule {}

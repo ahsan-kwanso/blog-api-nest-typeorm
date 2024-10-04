@@ -149,7 +149,6 @@ type Query {
   findCommentsOnPost(postId: Int!): CommentsResult!
   findOne(id: Int!): User!
   findOneComment(id: Int!): Comment!
-  getHello: String!
   getPost(id: Int!): Post
   getPosts(paginationQuery: PaginationQueryDto!): PaginatedPostsResponse!
   searchPosts(paginationQuery: PaginationQueryDto!): PaginatedPostsResponse!

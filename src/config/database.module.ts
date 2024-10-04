@@ -29,7 +29,7 @@ import { UserSubscriber } from 'src/user/user.subscriber';
             migrationsDir: __dirname + '/migrations/',
           },
           logging: true,
-          subscribers: [UserSubscriber], // Add the subscriber(s) here
+          //subscribers: [UserSubscriber], // Add the subscriber(s) here, move it to providers
         };
       },
       inject: [ConfigService],
