@@ -344,3 +344,10 @@ generic nesting for comments on posts
 
 providers for configurations
 remove that query builder usage
+
+
+
+
+
+New Tasks and Requirements:
+  

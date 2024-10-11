@@ -20,6 +20,8 @@ import { join } from 'path'; // Needed for schema file path
 import { AppResolver } from './app.service';
 import { Request, Response } from 'express'; // Import Express types
 import { graphqlUploadExpress } from 'graphql-upload-minimal';
+import { DevtoolsModule } from '@nestjs/devtools-integration';
+
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }), // validation for config
@@ -38,6 +40,9 @@ import { graphqlUploadExpress } from 'graphql-upload-minimal';
         req,
         res,
       }), // Explicitly type req and res
+    }),
+    DevtoolsModule.register({
+      http: process.env.NODE_ENV !== 'production',
     }),
   ],
   providers: [
