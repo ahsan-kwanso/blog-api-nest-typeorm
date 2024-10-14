@@ -28,6 +28,7 @@ export class PostService {
     private readonly followerService: FollowerService,
     private readonly userService: UserService,
     @InjectQueue('email') private emailQueue: Queue, // Inject email queue
+    @InjectQueue('emailbatch') private emailbatchQueue: Queue, // Inject email queue
   ) {}
 
   async create(createPostDto: CreatePostDto, UserId: number): Promise<Post> {
@@ -44,6 +45,8 @@ export class PostService {
       // Fetch followers of the user who created the post
       const followerIds =
         await this.followerService.getFollowersByUserId(UserId);
+
+      /*
       for (let i = 0; i < followerIds.length; i++) {
         // For demonstration, assume we have a method to get the follower's email
         const followerEmail = await this.userService.getFollowerEmailById(
@@ -59,9 +62,29 @@ export class PostService {
         await this.emailQueue.add('sendEmail', {
           followerEmail,
           blogPost: savedPost,
-          timestamp: new Date(),
         });
       }
+      */
+      // Add the jobs as a single batch job
+      // Prepare the followers' emails
+      const followerEmails = await Promise.all(
+        followerIds.map(async (followerId) => {
+          const followerEmail =
+            await this.userService.getFollowerEmailById(followerId);
+          return { followerEmail, blogPost: savedPost.title };
+        }),
+      );
+
+      // Log the number of followers and that you're adding to the queue
+      console.log(
+        `Adding email task for ${followerEmails.length} followers to the queue...`,
+      );
+
+      // Add the jobs as a single batch job
+      await this.emailbatchQueue.add('sendEmailBatch', {
+        followers: followerEmails,
+        chunkSize: 2, // Specify the chunk size here
+      });
 
       return savedPost;
     } catch (error) {
