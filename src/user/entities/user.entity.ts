@@ -4,6 +4,7 @@ import { Post } from '../../post/post.entity';
 import { Comment } from '../../comment/comment.entity';
 import { Role } from './role.entity';
 import { BaseEntity } from '../../common/base.entity';
+import { Follower } from './follower.entity';
 
 @ObjectType() // Mark this as a GraphQL ObjectType
 @Entity({ name: 'Users' }) // Specify table name if needed
@@ -47,4 +48,14 @@ export class User extends BaseEntity {
   @Field({ nullable: true }) // Expose profilePictureUrl, allowing null
   @Column({ type: 'varchar', length: 550, nullable: true })
   profilePictureUrl: string; // New column for profile picture URL
+
+  // --- New Follower and Following Relationships ---
+
+  @Field(() => [Follower], { nullable: 'items' }) // Expose followers relationship in GraphQL
+  @OneToMany(() => Follower, (follower) => follower.followee)
+  followers: Follower[];
+
+  @Field(() => [Follower], { nullable: 'items' }) // Expose following relationship in GraphQL
+  @OneToMany(() => Follower, (follower) => follower.follower)
+  following: Follower[];
 }

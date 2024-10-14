@@ -350,4 +350,4 @@ remove that query builder usage
 
 
 New Tasks and Requirements:
-  
+  Redis integration for email sending on post creation.
