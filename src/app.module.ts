@@ -21,11 +21,13 @@ import { AppResolver } from './app.service';
 import { Request, Response } from 'express'; // Import Express types
 import { graphqlUploadExpress } from 'graphql-upload-minimal';
 import { DevtoolsModule } from '@nestjs/devtools-integration';
+import { RedisModule } from './integrations/redis/redis.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }), // validation for config
     DatabaseModule, // Add DatabaseModule here
+    RedisModule,
     UserModule,
     PostModule,
     CommentModule,
