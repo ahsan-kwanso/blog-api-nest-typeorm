@@ -12,6 +12,6 @@ export class EmailProcessor {
       console.log(
         `Sending email to ${followerEmail} about the blog post "${blogPost.title}"`,
       );
-    }, 1000); // Simulating delay with setTimeout
+    }, 2000); // Simulating delay with setTimeout
   }
 }

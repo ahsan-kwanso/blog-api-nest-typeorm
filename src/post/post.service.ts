@@ -12,8 +12,12 @@ import { PaginatedPostsResponse, PostResponse } from './dto/post.dto';
 import paginationConfig from 'src/utils/pagination.config';
 import { Role } from 'src/user/dto/role.enum';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, SelectQueryBuilder } from 'typeorm';
+import { Repository } from 'typeorm';
 import { FindManyOptions, ILike } from 'typeorm';
+import { FollowerService } from 'src/user/follower.service';
+import { UserService } from 'src/user/user.service';
+import { InjectQueue } from '@nestjs/bull';
+import { Queue } from 'bull';
 
 @Injectable()
 export class PostService {
@@ -21,6 +25,9 @@ export class PostService {
     @InjectRepository(Post)
     private readonly postRepository: Repository<Post>,
     private readonly urlGeneratorService: UrlGeneratorService,
+    private readonly followerService: FollowerService,
+    private readonly userService: UserService,
+    @InjectQueue('email') private emailQueue: Queue, // Inject email queue
   ) {}
 
   async create(createPostDto: CreatePostDto, UserId: number): Promise<Post> {
@@ -32,7 +39,31 @@ export class PostService {
       });
 
       // Save the new post to the database
-      return await this.postRepository.save(post);
+      const savedPost = await this.postRepository.save(post);
+
+      // Fetch followers of the user who created the post
+      const followerIds =
+        await this.followerService.getFollowersByUserId(UserId);
+      for (let i = 0; i < followerIds.length; i++) {
+        // For demonstration, assume we have a method to get the follower's email
+        const followerEmail = await this.userService.getFollowerEmailById(
+          followerIds[i],
+        ); // Implement this method as needed
+        // Add a job to the email queue
+        console.log('                                          ');
+        console.log('***************     *********************');
+        console.log(`Adding email task ${i + 1} to the queue...`);
+        console.log('***************     *********************');
+        console.log('                                          ');
+
+        await this.emailQueue.add('sendEmail', {
+          followerEmail,
+          blogPost: savedPost,
+          timestamp: new Date(),
+        });
+      }
+
+      return savedPost;
     } catch (error) {
       throw new ConflictException('Failed to create post');
     }

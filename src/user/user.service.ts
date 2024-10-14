@@ -373,4 +373,10 @@ export class UserService {
       throw new UnauthorizedException('Invalid token');
     }
   }
+
+  // adding find email by id, for sending emails to followers
+  async getFollowerEmailById(followerId: number): Promise<string> {
+    const follower = await this.findOne(followerId);
+    return follower.email;
+  }
 }

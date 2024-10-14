@@ -14,10 +14,12 @@ import { EmailModule } from 'src/integrations/sg/email.module';
 import { AuthResolver } from './auth.resolver';
 import { UserResolver } from './user.resolver';
 import { UserSubscriber } from './user.subscriber';
+import { FollowerService } from './follower.service';
+import { Follower } from './entities/follower.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User, Role]),
+    TypeOrmModule.forFeature([User, Role, Follower]),
     FileUploadModule,
     JwtModule,
     EmailModule,
@@ -31,6 +33,8 @@ import { UserSubscriber } from './user.subscriber';
     AuthResolver,
     UserResolver,
     UserSubscriber,
+    FollowerService,
   ],
+  exports: [UserService, FollowerService],
 })
 export class UserModule {}
