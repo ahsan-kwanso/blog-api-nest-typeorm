@@ -152,6 +152,7 @@ type Query {
   getPost(id: Int!): Post
   getPosts(paginationQuery: PaginationQueryDto!): PaginatedPostsResponse!
   searchPosts(paginationQuery: PaginationQueryDto!): PaginatedPostsResponse!
+  testRedis(taskCount: Int! = 5): String!
 }
 
 type Role {

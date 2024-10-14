@@ -1,20 +1,26 @@
 import { Module } from '@nestjs/common';
 import { BullModule } from '@nestjs/bull';
 import { EmailProcessor } from './processors/email.processor';
+import { DummyProcessor } from './processors/dummy.processor';
+import { DummyResolver } from './dummy.resolver';
+import { DummyService } from './dummy.service';
 
 @Module({
   imports: [
     BullModule.forRoot({
       redis: {
-        host: 'localhost',  // Replace with your Redis host
-        port: 6379,         // Replace with your Redis port if necessary
+        host: 'localhost', // Redis host
+        port: 6379, // Redis port
       },
     }),
     BullModule.registerQueue({
-      name: 'email',        // Name of the queue for email jobs
+      name: 'email', // Name of the queue for email jobs
+    }),
+    BullModule.registerQueue({
+      name: 'dummy', // Queue for dummy tasks
     }),
   ],
-  providers: [EmailProcessor],
-  exports: [BullModule],     // Export BullModule so it can be used in other modules
+  providers: [EmailProcessor, DummyProcessor, DummyResolver, DummyService],
+  exports: [BullModule], // Export BullModule so it can be used in other modules
 })
 export class RedisModule {}
