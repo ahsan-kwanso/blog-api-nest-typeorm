@@ -6,6 +6,11 @@ import { DummyProcessor } from './processors/dummy.processor';
 import { DummyResolver } from './dummy.resolver';
 import { DummyService } from './dummy.service';
 import { BatchEmailProcessor } from './processors/email.batch.processor';
+import {
+  BATCH_EMAIL_PROCESSOR_QUEUE,
+  DUMMY_PROCESSOR_QUEUE,
+  EMAIL_PROCESSOR_QUEUE,
+} from 'src/utils/constants';
 
 @Module({
   imports: [
@@ -19,13 +24,13 @@ import { BatchEmailProcessor } from './processors/email.batch.processor';
       inject: [ConfigService],
     }),
     BullModule.registerQueue({
-      name: 'email', // Name of the queue for email jobs
+      name: EMAIL_PROCESSOR_QUEUE, // Name of the queue for email jobs // //specify these in envs
     }),
     BullModule.registerQueue({
-      name: 'dummy', // Queue for dummy tasks
+      name: DUMMY_PROCESSOR_QUEUE, // Queue for dummy tasks
     }),
     BullModule.registerQueue({
-      name: 'emailbatch', // for testing in batch
+      name: BATCH_EMAIL_PROCESSOR_QUEUE, // for testing in batch
     }),
   ],
   providers: [

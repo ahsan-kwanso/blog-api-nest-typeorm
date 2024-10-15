@@ -1,12 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { InjectQueue } from '@nestjs/bull';
 import { Queue } from 'bull';
+import { DUMMY_PROCESSOR_QUEUE } from 'src/utils/constants';
 
 @Injectable()
 export class DummyService {
-  constructor(
-    @InjectQueue('dummy') private dummyQueue: Queue,
-  ) {}
+  constructor(@InjectQueue(DUMMY_PROCESSOR_QUEUE) private dummyQueue: Queue) {}
 
   async addMultipleDummyTasks(taskCount: number) {
     for (let i = 0; i < taskCount; i++) {

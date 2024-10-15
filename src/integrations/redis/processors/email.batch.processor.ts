@@ -1,12 +1,13 @@
 import { Processor, Process } from '@nestjs/bull';
 import { Job } from 'bull';
+import { BATCH_EMAIL_PROCESSOR_QUEUE } from 'src/utils/constants';
 
 interface EmailJobData {
   followerEmail: string;
   blogPost: string; // Ensure Post is imported from your entity or model
 }
 
-@Processor('emailbatch')
+@Processor(BATCH_EMAIL_PROCESSOR_QUEUE)
 export class BatchEmailProcessor {
   @Process('sendEmailBatch')
   async handleSendEmailBatch(job: Job) {

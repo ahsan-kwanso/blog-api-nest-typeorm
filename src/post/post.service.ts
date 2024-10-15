@@ -18,6 +18,10 @@ import { FollowerService } from 'src/user/follower.service';
 import { UserService } from 'src/user/user.service';
 import { InjectQueue } from '@nestjs/bull';
 import { Queue } from 'bull';
+import {
+  BATCH_EMAIL_PROCESSOR_QUEUE,
+  EMAIL_PROCESSOR_QUEUE,
+} from 'src/utils/constants';
 
 @Injectable()
 export class PostService {
@@ -27,8 +31,8 @@ export class PostService {
     private readonly urlGeneratorService: UrlGeneratorService,
     private readonly followerService: FollowerService,
     private readonly userService: UserService,
-    @InjectQueue('email') private emailQueue: Queue, // Inject email queue
-    @InjectQueue('emailbatch') private emailbatchQueue: Queue, // Inject email queue
+    @InjectQueue(EMAIL_PROCESSOR_QUEUE) private emailQueue: Queue, // Inject email queue
+    @InjectQueue(BATCH_EMAIL_PROCESSOR_QUEUE) private emailbatchQueue: Queue, // Inject email queue
   ) {}
 
   async create(createPostDto: CreatePostDto, UserId: number): Promise<Post> {

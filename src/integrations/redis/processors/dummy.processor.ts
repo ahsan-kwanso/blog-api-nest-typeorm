@@ -1,7 +1,8 @@
 import { Processor, Process } from '@nestjs/bull';
 import { Job } from 'bull';
+import { DUMMY_PROCESSOR_QUEUE } from 'src/utils/constants';
 
-@Processor('dummy')
+@Processor(DUMMY_PROCESSOR_QUEUE)
 export class DummyProcessor {
   @Process('dummyTask')
   async handleDummyTask(job: Job) {
