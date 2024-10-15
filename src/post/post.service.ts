@@ -22,6 +22,7 @@ import {
   BATCH_EMAIL_PROCESSOR_QUEUE,
   EMAIL_PROCESSOR_QUEUE,
 } from 'src/utils/constants';
+import { RedisService } from 'src/integrations/redis/redis.service';
 
 @Injectable()
 export class PostService {
@@ -31,6 +32,7 @@ export class PostService {
     private readonly urlGeneratorService: UrlGeneratorService,
     private readonly followerService: FollowerService,
     private readonly userService: UserService,
+    private readonly redisService: RedisService,
     @InjectQueue(EMAIL_PROCESSOR_QUEUE) private emailQueue: Queue, // Inject email queue
     @InjectQueue(BATCH_EMAIL_PROCESSOR_QUEUE) private emailbatchQueue: Queue, // Inject email queue
   ) {}
@@ -92,6 +94,7 @@ export class PostService {
       console.log(jobIds);
       console.log('                           ');
       //return {savedPost, jobIds};
+      await this.redisService.associatePostWithJobs(savedPost.id, jobIds);
       return savedPost;
     } catch (error) {
       throw new ConflictException('Failed to create post');

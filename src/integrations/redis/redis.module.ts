@@ -13,6 +13,7 @@ import {
 } from 'src/utils/constants';
 import { JobProgressResolver } from './job.progress.resolver';
 import { JobsProgressService } from './job.progress.service';
+import { RedisService } from './redis.service';
 
 @Module({
   imports: [
@@ -43,7 +44,8 @@ import { JobsProgressService } from './job.progress.service';
     BatchEmailProcessor,
     JobProgressResolver,
     JobsProgressService,
+    RedisService,
   ],
-  exports: [BullModule], // Export BullModule so it can be used in other modules
+  exports: [BullModule, RedisService], // Export BullModule so it can be used in other modules
 })
 export class RedisModule {}
