@@ -10,14 +10,20 @@ export class FollowerService {
     private readonly followerRepository: Repository<Follower>,
   ) {}
 
-  async getFollowersByUserId(userId: number): Promise<number[]> {
+  async getFollowersByUserId(
+    userId: number,
+    limit: number,
+    offset: number,
+  ): Promise<number[]> {
     const followers = await this.followerRepository.find({
       where: {
-        followee: { id: userId }, // Use the followee relation
+        followee: { id: userId },
       },
-      relations: ['follower'], // Load the follower relation
+      relations: ['follower'],
+      take: limit, // Limit the number of followers returned
+      skip: offset, // Skip records for pagination
     });
 
-    return followers.map((follower) => follower.follower.id); // Access follower's id
+    return followers.map((follower) => follower.follower.id);
   }
 }

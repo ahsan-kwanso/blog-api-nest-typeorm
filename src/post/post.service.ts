@@ -46,49 +46,46 @@ export class PostService {
       // Save the new post to the database
       const savedPost = await this.postRepository.save(post);
 
-      // Fetch followers of the user who created the post
-      const followerIds =
-        await this.followerService.getFollowersByUserId(UserId);
+      const limit = 2; // Set a reasonable batch size
+      let offset = 0;
+      let batchFollowerIds: number[] = [];
 
-      /*
-      for (let i = 0; i < followerIds.length; i++) {
-        // For demonstration, assume we have a method to get the follower's email
-        const followerEmail = await this.userService.getFollowerEmailById(
-          followerIds[i],
-        ); // Implement this method as needed
-        // Add a job to the email queue
-        console.log('                                          ');
-        console.log('***************     *********************');
-        console.log(`Adding email task ${i + 1} to the queue...`);
-        console.log('***************     *********************');
-        console.log('                                          ');
+      do {
+        // Fetch followers in batches
+        batchFollowerIds = await this.followerService.getFollowersByUserId(
+          UserId,
+          limit,
+          offset,
+        );
 
-        await this.emailQueue.add('sendEmail', {
-          followerEmail,
-          blogPost: savedPost,
+        // Fetch emails for the current batch of followers
+        console.log('                                          ');
+        console.log('     ***************  **************      ');
+        console.log('             fetch mail started           ');
+        console.log('     ***************  **************      ');
+        console.log('                                          ');
+        const followerEmails = await Promise.all(
+          batchFollowerIds.map(async (followerId) => {
+            const followerEmail =
+              await this.userService.getFollowerEmailById(followerId);
+            return { followerEmail, blogPost: savedPost.title };
+          }),
+        );
+
+        // Queue emails for the current batch
+        console.log('                                          ');
+        console.log('     ***************  **************      ');
+        console.log('adding these into queue: ', followerEmails);
+        console.log('     ***************  **************      ');
+        console.log('                                          ');
+        await this.emailbatchQueue.add('sendEmailBatch', {
+          followers: followerEmails,
+          chunkSize: 2,
         });
-      }
-      */
-      // Add the jobs as a single batch job
-      // Prepare the followers' emails
-      const followerEmails = await Promise.all(
-        followerIds.map(async (followerId) => {
-          const followerEmail =
-            await this.userService.getFollowerEmailById(followerId);
-          return { followerEmail, blogPost: savedPost.title };
-        }),
-      );
 
-      // Log the number of followers and that you're adding to the queue
-      console.log(
-        `Adding email task for ${followerEmails.length} followers to the queue...`,
-      );
-
-      // Add the jobs as a single batch job
-      await this.emailbatchQueue.add('sendEmailBatch', {
-        followers: followerEmails,
-        chunkSize: 2, // Specify the chunk size here
-      });
+        // Increment the offset for the next batch
+        offset += limit;
+      } while (batchFollowerIds.length > 0);
 
       return savedPost;
     } catch (error) {
