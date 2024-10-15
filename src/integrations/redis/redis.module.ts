@@ -12,6 +12,7 @@ import {
   EMAIL_PROCESSOR_QUEUE,
 } from 'src/utils/constants';
 import { JobProgressResolver } from './job.progress.resolver';
+import { JobsProgressService } from './job.progress.service';
 
 @Module({
   imports: [
@@ -41,6 +42,7 @@ import { JobProgressResolver } from './job.progress.resolver';
     DummyService,
     BatchEmailProcessor,
     JobProgressResolver,
+    JobsProgressService,
   ],
   exports: [BullModule], // Export BullModule so it can be used in other modules
 })
