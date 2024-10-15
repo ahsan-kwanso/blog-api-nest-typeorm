@@ -94,7 +94,12 @@ export class PostService {
       console.log(jobIds);
       console.log('                           ');
       //return {savedPost, jobIds};
-      await this.redisService.associatePostWithJobs(savedPost.id, jobIds);
+      const ttlInSeconds = 3600; // 1 hour in seconds
+      await this.redisService.associatePostWithJobs(
+        savedPost.id,
+        jobIds,
+        ttlInSeconds,
+      );
       return savedPost;
     } catch (error) {
       throw new ConflictException('Failed to create post');

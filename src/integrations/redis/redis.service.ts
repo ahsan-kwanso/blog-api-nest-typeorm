@@ -23,8 +23,18 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
   }
 
   // Method to associate postId with jobIds
-  async associatePostWithJobs(postId: number, jobIds: string[]) {
-    await this.redisClient.sadd(`post:${postId}:jobs`, ...jobIds);
+  async associatePostWithJobs(
+    postId: number,
+    jobIds: string[],
+    ttlInSeconds: number = 86400,
+  ) {
+    const redisKey = `post:${postId}:jobs`;
+
+    // Add the jobIds to the Redis set
+    await this.redisClient.sadd(redisKey, ...jobIds);
+
+    // Set a TTL (Time-to-Live) for the key, default is 24 hours (86400 seconds)
+    await this.redisClient.expire(redisKey, ttlInSeconds);
   }
 
   // Method to get jobIds by postId
