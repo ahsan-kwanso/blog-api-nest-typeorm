@@ -91,6 +91,7 @@ export class PostService {
       console.log('                           ');
       console.log(jobIds);
       console.log('                           ');
+      //return {savedPost, jobIds};
       return savedPost;
     } catch (error) {
       throw new ConflictException('Failed to create post');

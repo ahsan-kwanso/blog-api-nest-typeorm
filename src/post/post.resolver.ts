@@ -33,6 +33,8 @@ export class PostResolver {
     @LoggedInUserId() userId: number,
   ): Promise<Message> {
     await this.postService.create(createPostDto, userId);
+    //const postWithJobIds = await this.postService.create(createPostDto, userId);
+    //console.log('postWithJobIds', postWithJobIds);
     return { message: 'Post created successfully' };
   }
 
