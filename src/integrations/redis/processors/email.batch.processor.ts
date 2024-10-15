@@ -12,19 +12,26 @@ export class BatchEmailProcessor {
   @Process('sendEmailBatch')
   async handleSendEmailBatch(job: Job) {
     const { followers, chunkSize } = job.data;
-
-    for (let i = 0; i < followers.length; i += chunkSize) {
-      // Get the current chunk of followers
+    const totalEmails = followers.length;
+    /*
+    
+     */
+    for (let i = 0; i < totalEmails; i += chunkSize) {
       const chunk = followers.slice(i, i + chunkSize);
-      // Process each email in the chunk
+
       await Promise.all(
         chunk.map(async ({ followerEmail, blogPost }: EmailJobData) => {
           await this.sendEmail(followerEmail, blogPost);
         }),
       );
 
-      // Delay between sending chunks to avoid overwhelming the service
-      await this.delay(2000); // 2 seconds delay
+      // Delay between chunks to avoid overwhelming service
+      await this.delay(20000);
+
+      // Update job progress based on how many emails have been processed
+      const processed = Math.min(i + chunkSize, totalEmails); // Ensure no overflow
+      const progressPercentage = Math.round((processed / totalEmails) * 100);
+      await job.progress(progressPercentage); // Update job progress
     }
   }
 
@@ -32,7 +39,6 @@ export class BatchEmailProcessor {
     console.log(
       `Sending email to ${followerEmail} about the blog post "${blogPost}"`,
     );
-    // Simulate sending email (implement your email sending logic here)
     return new Promise((resolve) => setTimeout(resolve, 500)); // Simulate email sending delay
   }
 

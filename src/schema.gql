@@ -101,6 +101,12 @@ type Mutation {
   verifyEmail(token: String!): Message!
 }
 
+type OverallProgress {
+  emailsProcessed: Float!
+  overallProgressPercentage: Float!
+  totalEmails: Float!
+}
+
 type PaginatedPostsResponse {
   nextPage: String
   page: Int
@@ -158,6 +164,7 @@ type Query {
   findOneComment(id: Int!): Comment!
   getPost(id: Int!): Post
   getPosts(paginationQuery: PaginationQueryDto!): PaginatedPostsResponse!
+  overallJobProgress(jobIds: [String!]!): OverallProgress!
   searchPosts(paginationQuery: PaginationQueryDto!): PaginatedPostsResponse!
   testRedis(taskCount: Int! = 5): String!
 }

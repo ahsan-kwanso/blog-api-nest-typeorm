@@ -49,6 +49,7 @@ export class PostService {
       const limit = 2; // Set a reasonable batch size
       let offset = 0;
       let batchFollowerIds: number[] = [];
+      const jobIds: string[] = [];
 
       do {
         // Fetch followers in batches
@@ -78,15 +79,18 @@ export class PostService {
         console.log('adding these into queue: ', followerEmails);
         console.log('     ***************  **************      ');
         console.log('                                          ');
-        await this.emailbatchQueue.add('sendEmailBatch', {
+        const job = await this.emailbatchQueue.add('sendEmailBatch', {
           followers: followerEmails,
           chunkSize: 2,
         });
 
+        jobIds.push(job.id.toString());
         // Increment the offset for the next batch
         offset += limit;
       } while (batchFollowerIds.length > 0);
-
+      console.log('                           ');
+      console.log(jobIds);
+      console.log('                           ');
       return savedPost;
     } catch (error) {
       throw new ConflictException('Failed to create post');
