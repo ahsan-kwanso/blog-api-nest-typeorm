@@ -8,6 +8,8 @@ interface EmailJobData {
   blogPost: string;
 }
 
+// will add retry in chunks
+
 @Processor(BATCH_EMAIL_PROCESSOR_QUEUE)
 export class RetryEmailProcessor {
   constructor(private readonly emailService: EmailService) {}
