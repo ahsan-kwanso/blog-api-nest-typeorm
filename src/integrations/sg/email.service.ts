@@ -31,4 +31,25 @@ export class EmailService {
       throw new Error('Failed to send verification email');
     }
   }
+
+  async sendEmail(
+    email: string,
+    subject: string,
+    message: string,
+  ): Promise<void> {
+    const msg = {
+      to: email,
+      from: this.senderEmail, // Use the injected sender email
+      subject: `${subject}`,
+      text: `${message}`,
+    };
+
+    try {
+      await sgMail.send(msg);
+      console.log(`Verification email sent to ${email}`);
+    } catch (error) {
+      console.error('Error sending verification email:', error);
+      throw new Error('Failed to send verification email');
+    }
+  }
 }
