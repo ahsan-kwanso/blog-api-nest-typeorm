@@ -3,14 +3,18 @@ import { Job, Queue } from 'bull';
 import { OverallProgress } from './dto/overallProgress.dto';
 import { BATCH_EMAIL_PROCESSOR_QUEUE } from 'src/utils/constants';
 import { InjectQueue } from '@nestjs/bull';
+import { RedisService } from './redis.service';
 
 @Injectable()
 export class JobsProgressService {
   constructor(
+    private readonly redisService: RedisService,
     @InjectQueue(BATCH_EMAIL_PROCESSOR_QUEUE) private readonly jobQueue: Queue,
   ) {}
 
-  async calculateOverallProgress(jobIds: string[]): Promise<OverallProgress> {
+  async calculateOverallProgress(postId: number): Promise<OverallProgress> {
+    // Get the jobIds associated with the postId
+    const jobIds = await this.redisService.getJobsByPostId(postId);
     let totalEmails = 0; // Total emails across all jobs
     let emailsProcessed = 0; // Processed emails across all jobs
 

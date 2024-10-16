@@ -39,6 +39,7 @@ export class PostService {
 
   async create(createPostDto: CreatePostDto, UserId: number): Promise<Post> {
     try {
+      const authorEmail = await this.userService.getEmailById(UserId);
       // Create a new instance of the Post entity
       const post = this.postRepository.create({
         ...createPostDto,
@@ -70,7 +71,7 @@ export class PostService {
         const followerEmails = await Promise.all(
           batchFollowerIds.map(async (followerId) => {
             const followerEmail =
-              await this.userService.getFollowerEmailById(followerId);
+              await this.userService.getEmailById(followerId);
             return { followerEmail, blogPost: savedPost.title };
           }),
         );
@@ -84,6 +85,8 @@ export class PostService {
         const job = await this.emailbatchQueue.add('sendEmailBatch', {
           followers: followerEmails,
           chunkSize: 2,
+          postId: savedPost.id,
+          authorEmail,
         });
 
         jobIds.push(job.id.toString());

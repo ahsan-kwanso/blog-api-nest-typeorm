@@ -43,13 +43,12 @@ export class EmailService {
       subject: `${subject}`,
       text: `${message}`,
     };
-
     try {
       await sgMail.send(msg);
-      console.log(`Verification email sent to ${email}`);
+      console.log(`Completion email sent to ${email}`);
     } catch (error) {
-      console.error('Error sending verification email:', error);
-      throw new Error('Failed to send verification email');
+      console.error('Error sending completion email:', error);
+      throw new Error('Failed to send completion email');
     }
   }
 }

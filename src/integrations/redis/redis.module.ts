@@ -14,6 +14,7 @@ import {
 import { JobProgressResolver } from './job.progress.resolver';
 import { JobsProgressService } from './job.progress.service';
 import { RedisService } from './redis.service';
+import { EmailModule } from '../sg/email.module';
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { RedisService } from './redis.service';
     BullModule.registerQueue({
       name: BATCH_EMAIL_PROCESSOR_QUEUE, // for testing in batch
     }),
+    EmailModule,
   ],
   providers: [
     EmailProcessor,

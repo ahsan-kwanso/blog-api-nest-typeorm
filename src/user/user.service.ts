@@ -355,8 +355,8 @@ export class UserService {
   }
 
   // adding find email by id, for sending emails to followers
-  async getFollowerEmailById(followerId: number): Promise<string> {
-    const follower = await this.findOne(followerId);
+  async getEmailById(id: number): Promise<string> {
+    const follower = await this.findOne(id);
     return follower.email;
   }
 }
