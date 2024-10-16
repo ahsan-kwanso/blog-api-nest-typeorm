@@ -15,6 +15,7 @@ import { JobProgressResolver } from './job.progress.resolver';
 import { JobsProgressService } from './job.progress.service';
 import { RedisService } from './redis.service';
 import { EmailModule } from '../sg/email.module';
+import { RetryEmailProcessor } from './processors/retry.email.processor';
 
 @Module({
   imports: [
@@ -47,6 +48,7 @@ import { EmailModule } from '../sg/email.module';
     JobProgressResolver,
     JobsProgressService,
     RedisService,
+    RetryEmailProcessor,
   ],
   exports: [BullModule, RedisService], // Export BullModule so it can be used in other modules
 })
