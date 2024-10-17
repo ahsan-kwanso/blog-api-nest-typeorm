@@ -4,7 +4,4 @@ import { ObjectType, Field } from '@nestjs/graphql';
 export class LoginResponse {
   @Field()
   message: string;
-
-  @Field()
-  token: string;
 }

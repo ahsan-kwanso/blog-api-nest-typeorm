@@ -78,7 +78,6 @@ input LoginDto {
 
 type LoginResponse {
   message: String!
-  token: String!
 }
 
 type Message {
