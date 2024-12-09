@@ -4,21 +4,20 @@ import {
   ExecutionContext,
   UnauthorizedException,
 } from '@nestjs/common';
-import { Reflector } from '@nestjs/core';
+import { GqlExecutionContext } from '@nestjs/graphql';
 import { JwtService } from 'src/utils/jwt.service';
-import { Request } from 'express';
 
 @Injectable()
 export class ConditionalAuthGuard implements CanActivate {
-  constructor(
-    private readonly jwtService: JwtService,
-    private readonly reflector: Reflector,
-  ) {}
+  constructor(private readonly jwtService: JwtService) {}
 
   canActivate(context: ExecutionContext): boolean | Promise<boolean> {
-    const request = context.switchToHttp().getRequest<Request>();
-    const filter = request.query['filter']; // Check for the filter query parameter
-
+    const gqlContext = GqlExecutionContext.create(context);
+    const request = gqlContext.getContext().req; // Get the request from GraphQL context
+    //console.log(request.body.query);
+    const filter = gqlContext.getArgs().paginationQuery.filter;
+    //const filter = request.query['filter']; // Check for the filter query parameter
+    // console.log(filter);
     // If 'filter' is 'my-posts', enforce authentication
     if (filter === 'my-posts') {
       const token = request.cookies['auth_token'];

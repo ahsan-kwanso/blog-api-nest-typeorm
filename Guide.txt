@@ -326,3 +326,28 @@ that response handling in interceptor means cookie setting
 modify element of some other module service, and access that somewhere else what will happen
 modify at separate place and access at separate place
 module initialization confirmed through constructor calls on startup they are initialized
+
+
+
+Ok so now formal conversion to graphql starts. First test all rest end points and then do some work with that dummy projec.
+
+
+
+
+Some more to do
+
+remove that req usage from that protected route check as well when u get time
+dont send that token in response
+generic nesting for comments on posts
+
+
+
+providers for configurations
+remove that query builder usage
+
+
+
+
+
+New Tasks and Requirements:
+  Redis integration for email sending on post creation.

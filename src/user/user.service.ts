@@ -10,7 +10,7 @@ import { User } from './entities/user.entity';
 import { RoleService } from './role.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { PaginatedUserWithNumberOfPosts } from 'src/user/dto/user';
+import { PaginatedUserWithNumberOfPosts } from 'src/user/dto/user.dto';
 import { SignupDto } from './dto/signup.dto';
 import { LoginDto } from './dto/login.dto';
 import { Role as RoleEnum } from './dto/role.enum';
@@ -23,6 +23,18 @@ import { PasswordHelper } from './password.helper';
 import { JwtService } from 'src/utils/jwt.service';
 import * as crypto from 'crypto';
 import { ConfigService } from '@nestjs/config';
+import { FileUpload } from 'graphql-upload-minimal';
+import { Readable } from 'stream';
+import { UserQueryBuilderUtil } from 'src/common/user-query-builder.util';
+
+async function streamToBuffer(stream: Readable): Promise<Buffer> {
+  return new Promise((resolve, reject) => {
+    const chunks: Buffer[] = [];
+    stream.on('data', (chunk) => chunks.push(Buffer.from(chunk)));
+    stream.on('error', reject);
+    stream.on('end', () => resolve(Buffer.concat(chunks)));
+  });
+}
 
 @Injectable()
 export class UserService {
@@ -47,36 +59,15 @@ export class UserService {
     sortBy?: string,
     sortOrder?: 'asc' | 'desc',
   ): Promise<PaginatedUserWithNumberOfPosts> {
-    // Construct order clause based on sortBy and sortOrder
-    const order: { [key: string]: 'ASC' | 'DESC' } = {};
-    if (sortBy) {
-      const sortField = sortBy === 'posts' ? 'postscount' : 'user.name';
-      order[sortField] = (sortOrder?.toUpperCase() as 'ASC' | 'DESC') || 'ASC';
-    }
-
-    const queryBuilder = this.userRepository
-      .createQueryBuilder('user')
-      .leftJoinAndSelect('user.posts', 'post') // Join with posts to count them
-      .leftJoin('user.role', 'role') // Join with role to access role properties
-      .select([
-        'user.id AS user_id',
-        'user.name AS user_name',
-        'user.email AS user_email',
-        'role.name AS user_role', // Accessing role name correctly
-        'COUNT(post.id) AS postscount', // Count posts and alias as postscount
-      ])
-      .groupBy('user.id') // Group by user ID
-      .addGroupBy('role.name') // Group by role name
-      .offset((page - 1) * limit) // Offset for pagination
-      .limit(limit); // Limit the results
-
-    if (role) {
-      queryBuilder.andWhere('role.name = :role', { role }); // Corrected to access role name
-    }
-
-    if (Object.keys(order).length) {
-      queryBuilder.orderBy(order);
-    }
+    const queryBuilder = this.userRepository.createQueryBuilder('user');
+    UserQueryBuilderUtil.buildUserWithPostsQuery(
+      queryBuilder,
+      page,
+      limit,
+      role,
+      sortBy,
+      sortOrder,
+    );
 
     // Fetch paginated users and total count
     const [users, countResult] = await Promise.all([
@@ -109,14 +100,16 @@ export class UserService {
       total: totalCount,
       page: page,
       pageSize: limit,
-      nextPage: this.urlGeneratorService.generateNextPageUrl2(
-        nextPage,
-        limit,
-        baseUrl,
-        queryParams,
-      ),
+      nextPage:
+        this.urlGeneratorService.generateNextPageUrl2(
+          nextPage,
+          limit,
+          baseUrl,
+          queryParams,
+        ) || '',
     };
   }
+
   async findOne(id: number): Promise<User> {
     const user = await this.userRepository.findOne({
       where: { id },
@@ -209,6 +202,46 @@ export class UserService {
     }
   }
 
+  async uploadProfilePicture2(
+    userId: number,
+    file: FileUpload,
+    loggedInUserId: number,
+  ): Promise<User> {
+    if (userId !== loggedInUserId) {
+      throw new ForbiddenException('You are not authenticated.');
+    }
+
+    const user = await this.userRepository.findOne({
+      where: { id: userId },
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    try {
+      // Convert the FileUpload stream to a buffer
+      const { createReadStream, filename, mimetype } = file;
+      const fileBuffer = await streamToBuffer(createReadStream());
+
+      // Use FileUploadService to upload file and get the file key
+      const fileKey = await this.fileUploadService.uploadFileGql({
+        buffer: fileBuffer,
+        originalname: filename,
+        mimetype: mimetype,
+      });
+
+      // Get signed URL
+      const signedUrl = await this.fileUploadService.getSignedUrlS(fileKey);
+      user.profilePictureUrl = signedUrl;
+      await this.userRepository.save(user);
+
+      return user;
+    } catch (error) {
+      throw new InternalServerErrorException('Error uploading profile picture');
+    }
+  }
+
   async signup(signupDto: SignupDto): Promise<string> {
     const verificationToken = crypto.randomBytes(32).toString('hex'); // Generate a 6-character code
 
@@ -240,7 +273,6 @@ export class UserService {
     const user = await this.userRepository.findOne({
       where: { verificationToken: token },
     });
-
     if (!user) {
       throw new BadRequestException('Invalid verification token.');
     }
@@ -320,5 +352,11 @@ export class UserService {
     } catch (error) {
       throw new UnauthorizedException('Invalid token');
     }
+  }
+
+  // adding find email by id, for sending emails to followers
+  async getEmailById(id: number): Promise<string> {
+    const follower = await this.findOne(id);
+    return follower.email;
   }
 }

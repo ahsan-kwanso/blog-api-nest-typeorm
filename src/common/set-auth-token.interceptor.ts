@@ -3,20 +3,18 @@ import {
   NestInterceptor,
   ExecutionContext,
   CallHandler,
-  UnauthorizedException,
 } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
-import { Response } from 'express';
+import { GqlExecutionContext } from '@nestjs/graphql'; // Import GqlExecutionContext
 
 @Injectable()
 export class SetAuthTokenInterceptor implements NestInterceptor {
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
+    const ctx = GqlExecutionContext.create(context); // Create GqlExecutionContext
+    const response = ctx.getContext().res; // Access the response object from the context
     return next.handle().pipe(
       tap((data) => {
-        const request = context.switchToHttp().getRequest();
-        const response: Response = context.switchToHttp().getResponse();
-
         // Check if the response contains a token
         if (data && data.token) {
           response.cookie('auth_token', data.token, {
@@ -25,8 +23,6 @@ export class SetAuthTokenInterceptor implements NestInterceptor {
             maxAge: 86400000, // 1 day
             sameSite: 'strict',
           });
-        } else {
-          throw new UnauthorizedException('No token provided');
         }
       }),
     );

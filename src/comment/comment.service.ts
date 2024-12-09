@@ -8,7 +8,7 @@ import { Repository } from 'typeorm';
 import { Comment } from './comment.entity';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';
-import { CommentData, CommentsResult } from 'src/comment/dto/comment';
+import { CommentData, CommentsResult } from 'src/comment/dto/comment.dto';
 import { PostService } from 'src/post/post.service';
 
 @Injectable()

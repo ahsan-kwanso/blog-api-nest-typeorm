@@ -1,0 +1,233 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type ActualComment {
+  ParentCommentId: Int
+  PostId: Int!
+  UserId: Int!
+  content: String!
+  createdAt: DateTime!
+  id: Int!
+  updatedAt: DateTime!
+}
+
+type Comment {
+  ParentCommentId: Int
+  PostId: Int!
+  UserId: Int!
+  childComments: [Comment!]
+  content: String!
+  createdAt: DateTime!
+  id: Int!
+  parentComment: Comment
+  post: Post!
+  updatedAt: DateTime!
+  user: User!
+}
+
+type CommentData {
+  ParentCommentId: Int
+  PostId: Int!
+  UserId: Int!
+  content: String!
+  createdAt: DateTime!
+  id: Int!
+  subComments: [CommentData!]
+  updatedAt: DateTime!
+}
+
+type CommentsResult {
+  comments: [CommentData!]
+  message: String
+}
+
+input CreateCommentDto {
+  """ID of the parent comment if any"""
+  ParentCommentId: Int
+
+  """ID of the post the comment belongs to"""
+  PostId: Int!
+
+  """Content of the comment"""
+  content: String!
+}
+
+input CreatePostDto {
+  UserId: Int
+  content: String!
+  title: String!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+type Follower {
+  followedAt: DateTime!
+  followee: User!
+  follower: User!
+  id: Float!
+}
+
+input LoginDto {
+  email: String!
+  password: String!
+}
+
+type LoginResponse {
+  token: String!
+}
+
+type Message {
+  message: String!
+}
+
+type Mutation {
+  createComment(createCommentDto: CreateCommentDto!): Message!
+  createPost(createPostDto: CreatePostDto!): Message!
+  deletePost(id: Int!): Message!
+  login(loginDto: LoginDto!): LoginResponse!
+  remove(id: Int!): Message!
+  removeComment(id: Int!): Message!
+  signout: Message!
+  signup(signupDto: SignupDto!): Message!
+  update(id: Int!, updateUserDto: UpdateUserDto!): User!
+  updateComment(id: Int!, updateCommentDto: UpdateCommentDto!): Message!
+  updatePost(id: Int!, updatePostDto: UpdatePostDto!): Message!
+  uploadProfilePicture(file: Upload!, userId: Float!): User!
+  verifyEmail(token: String!): Message!
+}
+
+type OverallProgress {
+  emailsProcessed: Float!
+  overallProgressPercentage: Float!
+  totalEmails: Float!
+}
+
+type PaginatedPostsResponse {
+  nextPage: String
+  page: Int
+  pageSize: Int
+  posts: [PostResponse!]!
+  success: Boolean
+  total: Int!
+}
+
+type PaginatedUserWithNumberOfPosts {
+  nextPage: String
+  page: Float
+  pageSize: Float
+  total: Int!
+  users: [UserWithNumberOfPosts!]!
+}
+
+input PaginationQueryDto {
+  filter: String
+  limit: Float! = 2
+  page: Float! = 1
+  role: String
+  sortBy: String
+  sortOrder: String
+  title: String
+  userId: Float
+}
+
+type Post {
+  UserId: Int!
+  comments: [Comment!]!
+  content: String!
+  createdAt: DateTime!
+  id: Int!
+  title: String!
+  updatedAt: DateTime!
+  user: User!
+}
+
+type PostResponse {
+  author: String
+  content: String!
+  date: DateTime!
+  id: Int!
+  title: String!
+}
+
+type Query {
+  checkAuth: Message!
+  currentUser: User!
+  findAllComments: [Comment!]!
+  findAllPaginated(pagination: PaginationQueryDto!): PaginatedUserWithNumberOfPosts!
+  findCommentsOnPost(postId: Int!): CommentsResult!
+  findOne(id: Int!): User!
+  findOneComment(id: Int!): Comment!
+  getPost(id: Int!): Post
+  getPosts(paginationQuery: PaginationQueryDto!): PaginatedPostsResponse!
+  overallJobProgress(postId: Float!): OverallProgress!
+  overallJobProgress2(jobIds: [String!]!): OverallProgress!
+  searchPosts(paginationQuery: PaginationQueryDto!): PaginatedPostsResponse!
+  testRedis(taskCount: Int! = 5): String!
+}
+
+type Role {
+  id: Int!
+  name: String!
+  users: [User!]!
+}
+
+input SignupDto {
+  email: String!
+  name: String!
+  password: String!
+}
+
+input UpdateCommentDto {
+  """ID of the parent comment if any"""
+  ParentCommentId: Int
+
+  """ID of the post the comment belongs to"""
+  PostId: Int
+
+  """Content of the comment"""
+  content: String
+}
+
+input UpdatePostDto {
+  content: String
+  title: String
+}
+
+input UpdateUserDto {
+  RoleId: Float
+  email: String
+  name: String
+  password: String
+}
+
+"""The `Upload` scalar type represents a file upload."""
+scalar Upload
+
+type User {
+  RoleId: Int!
+  comments: [Comment!]!
+  createdAt: DateTime!
+  email: String!
+  followers: [Follower]!
+  following: [Follower]!
+  id: Int!
+  isVerified: Boolean!
+  name: String!
+  posts: [Post!]!
+  profilePictureUrl: String
+  role: Role!
+  updatedAt: DateTime!
+  verificationToken: String
+}
+
+type UserWithNumberOfPosts {
+  email: String!
+  id: Int!
+  name: String!
+  posts: Int!
+  role: String!
+}

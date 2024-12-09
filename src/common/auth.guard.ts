@@ -5,8 +5,8 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
+import { GqlExecutionContext } from '@nestjs/graphql';
 import { JwtService } from 'src/utils/jwt.service';
-import { Request } from 'express';
 import { IS_PUBLIC_KEY } from './public.decorator';
 
 @Injectable()
@@ -17,17 +17,19 @@ export class AuthGuard implements CanActivate {
   ) {}
 
   canActivate(context: ExecutionContext): boolean {
+    // For GraphQL, we extract the context in a different way
+    const ctx = GqlExecutionContext.create(context);
     const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
-      context.getHandler(),
-      context.getClass(),
+      ctx.getHandler(),
+      ctx.getClass(),
     ]);
 
     if (isPublic) {
       return true; // Allow public routes without authentication
     }
 
-    const request: Request = context.switchToHttp().getRequest();
-    const token = request.cookies['auth_token']; // Retrieve the token from the cookie
+    const req = ctx.getContext().req; // Access the request object from GraphQL context
+    const token = req.cookies['auth_token']; // Retrieve the token from the cookie
 
     if (!token) {
       throw new UnauthorizedException('No token provided');
@@ -35,7 +37,7 @@ export class AuthGuard implements CanActivate {
 
     try {
       const decoded = this.jwtService.verifyToken(token);
-      request['user'] = decoded; // Attach user info to the request
+      req['user'] = decoded; // Attach user info to the request
       return true; // Allow the request to proceed
     } catch (error) {
       throw new UnauthorizedException('Invalid token');

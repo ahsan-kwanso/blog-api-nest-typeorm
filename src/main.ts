@@ -6,7 +6,9 @@ import { ValidationPipe } from '@nestjs/common';
 import * as cookieParser from 'cookie-parser';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+    snapshot: true,
+  });
 
   const configService = app.get(ConfigService); // Get the ConfigService instance
   const port = configService.get<number>('PORT') || 3000; // Retrieve the port, fallback to 3000 if not defined

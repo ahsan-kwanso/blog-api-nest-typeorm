@@ -4,17 +4,25 @@ import {
   ConflictException,
   ForbiddenException,
 } from '@nestjs/common';
-import { Request as ExpressRequest } from 'express';
 import { Post } from 'src/post/post.entity';
 import { UrlGeneratorService } from 'src/utils/pagination.util';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
-import { PaginatedPostsResponse, PostResponse } from './dto/post';
+import { PaginatedPostsResponse, PostResponse } from './dto/post.dto';
 import paginationConfig from 'src/utils/pagination.config';
 import { Role } from 'src/user/dto/role.enum';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, SelectQueryBuilder } from 'typeorm';
-import { PaginationQueryDto } from 'src/common/pagination.dto';
+import { Repository } from 'typeorm';
+import { FindManyOptions, ILike } from 'typeorm';
+import { FollowerService } from 'src/user/follower.service';
+import { UserService } from 'src/user/user.service';
+import { InjectQueue } from '@nestjs/bull';
+import { Queue } from 'bull';
+import {
+  BATCH_EMAIL_PROCESSOR_QUEUE,
+  EMAIL_PROCESSOR_QUEUE,
+} from 'src/utils/constants';
+import { RedisService } from 'src/integrations/redis/redis.service';
 
 @Injectable()
 export class PostService {
@@ -22,10 +30,16 @@ export class PostService {
     @InjectRepository(Post)
     private readonly postRepository: Repository<Post>,
     private readonly urlGeneratorService: UrlGeneratorService,
+    private readonly followerService: FollowerService,
+    private readonly userService: UserService,
+    private readonly redisService: RedisService,
+    @InjectQueue(EMAIL_PROCESSOR_QUEUE) private emailQueue: Queue, // Inject email queue
+    @InjectQueue(BATCH_EMAIL_PROCESSOR_QUEUE) private emailbatchQueue: Queue, // Inject email queue
   ) {}
 
   async create(createPostDto: CreatePostDto, UserId: number): Promise<Post> {
     try {
+      const authorEmail = await this.userService.getEmailById(UserId);
       // Create a new instance of the Post entity
       const post = this.postRepository.create({
         ...createPostDto,
@@ -33,7 +47,63 @@ export class PostService {
       });
 
       // Save the new post to the database
-      return await this.postRepository.save(post);
+      const savedPost = await this.postRepository.save(post);
+
+      const limit = 2; // Set a reasonable batch size
+      let offset = 0;
+      let batchFollowerIds: number[] = [];
+      const jobIds: string[] = [];
+
+      do {
+        // Fetch followers in batches
+        batchFollowerIds = await this.followerService.getFollowersByUserId(
+          UserId,
+          limit,
+          offset,
+        );
+
+        // Fetch emails for the current batch of followers
+        console.log('                                          ');
+        console.log('     ***************  **************      ');
+        console.log('             fetch mail started           ');
+        console.log('     ***************  **************      ');
+        console.log('                                          ');
+        const followerEmails = await Promise.all(
+          batchFollowerIds.map(async (followerId) => {
+            const followerEmail =
+              await this.userService.getEmailById(followerId);
+            return { followerEmail, blogPost: savedPost.title };
+          }),
+        );
+
+        // Queue emails for the current batch
+        console.log('                                          ');
+        console.log('     ***************  **************      ');
+        console.log('adding these into queue: ', followerEmails);
+        console.log('     ***************  **************      ');
+        console.log('                                          ');
+        const job = await this.emailbatchQueue.add('sendEmailBatch', {
+          followers: followerEmails,
+          chunkSize: 2,
+          postId: savedPost.id,
+          authorEmail,
+        });
+
+        jobIds.push(job.id.toString());
+        // Increment the offset for the next batch
+        offset += limit;
+      } while (batchFollowerIds.length > 0);
+      console.log('                           ');
+      console.log(jobIds);
+      console.log('                           ');
+      //return {savedPost, jobIds};
+      const ttlInSeconds = 3600; // 1 hour in seconds
+      await this.redisService.associatePostWithJobs(
+        savedPost.id,
+        jobIds,
+        ttlInSeconds,
+      );
+      return savedPost;
     } catch (error) {
       throw new ConflictException('Failed to create post');
     }
@@ -62,19 +132,19 @@ export class PostService {
     }
 
     // Define userId based on the filter
-    const postUserId = filter === 'my-posts' ? currUserId : null;
+    const postUserId = filter === 'my-posts' ? currUserId : undefined;
 
-    // Fetch posts based on userId
-    const [posts, total] = await this.postRepository
-      .createQueryBuilder('post')
-      .leftJoinAndSelect('post.user', 'user')
-      .where(postUserId ? 'post.UserId = :userId' : '1=1', {
-        userId: postUserId,
-      })
-      .orderBy('post.createdAt', 'DESC')
-      .limit(limit)
-      .offset((page - 1) * limit)
-      .getManyAndCount();
+    // Create query options
+    const whereCondition = postUserId ? { user: { id: postUserId } } : {};
+
+    // Fetch posts using repository's findAndCount method
+    const [posts, total] = await this.postRepository.findAndCount({
+      where: whereCondition,
+      relations: ['user'],
+      order: { createdAt: 'DESC' },
+      skip: (page - 1) * limit,
+      take: limit,
+    });
 
     // Format posts
     const formattedPosts: PostResponse[] = posts.map((post) => ({
@@ -113,13 +183,18 @@ export class PostService {
     baseUrl?: string, // Pass base URL for URL generation
     currUserId?: number,
   ): Promise<PaginatedPostsResponse> {
-    const pageSize = Number(limit);
-    const pageNumber = Number(page);
-
-    const queryBuilder: SelectQueryBuilder<Post> = this.postRepository
-      .createQueryBuilder('post')
-      .leftJoinAndSelect('post.user', 'user')
-      .where('post.title ILIKE :title', { title: `%${title}%` });
+    // Define the query options
+    const options: FindManyOptions<Post> = {
+      where: {
+        title: ILike(`%${title}%`),
+      },
+      relations: ['user'], // Include the user relation
+      take: limit,
+      skip: (page - 1) * limit,
+      order: {
+        createdAt: 'DESC',
+      },
+    };
 
     // Handle 'my-posts' filter
     if (filter === 'my-posts') {
@@ -130,16 +205,13 @@ export class PostService {
       if (userId !== currUserId) {
         throw new ForbiddenException('You do not have permissions');
       }
-      queryBuilder.andWhere('post.UserId = :userId', { userId });
+      options.where = {
+        ...options.where,
+        UserId: userId, // Filter by userId
+      };
     }
 
-    // Apply pagination and sorting
-    queryBuilder
-      .take(pageSize)
-      .skip((pageNumber - 1) * pageSize)
-      .orderBy('post.createdAt', 'DESC');
-
-    const [posts, total] = await queryBuilder.getManyAndCount();
+    const [posts, total] = await this.postRepository.findAndCount(options);
 
     const formattedPosts = posts.map((post) => ({
       id: post.id,
@@ -149,17 +221,17 @@ export class PostService {
       date: post.updatedAt,
     }));
 
-    const totalPages = Math.ceil(total / pageSize);
-    const nextPage = pageNumber < totalPages ? pageNumber + 1 : null;
+    const totalPages = Math.ceil(total / limit);
+    const nextPage = page < totalPages ? page + 1 : null;
 
     return {
       posts: formattedPosts,
       total,
-      page: pageNumber,
-      pageSize: pageSize,
+      page: page,
+      pageSize: limit,
       nextPage: this.urlGeneratorService.generateNextPageUrl2(
         nextPage,
-        pageSize,
+        limit,
         baseUrl!,
         queryParams,
       ),
