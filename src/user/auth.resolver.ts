@@ -33,7 +33,7 @@ export class AuthResolver {
   @UseInterceptors(SetAuthTokenInterceptor) // Apply the interceptor for cookie setting
   async login(@Args('loginDto') loginDto: LoginDto): Promise<LoginResponse> {
     const token = await this.authService.login(loginDto);
-    return { message: 'Login successful' }; // Return token for interceptor to process
+    return { token: token }; // Return token for interceptor to process
   }
 
   @Public() // This decorator can be adjusted or removed later
